@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyle Risley</title>
+    <style>
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 0 20px;
+            color: #1a1a1a;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 0;
+        }
+        p.tagline {
+            margin-top: 6px;
+            color: #666;
+            font-size: 15px;
+        }
+        a {
+            color: inherit;
+            text-decoration-color: #ccc;
+            text-underline-offset: 3px;
+            transition: text-decoration-color 0.2s;
+        }
+        a:hover {
+            text-decoration-color: #1a1a1a;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #e5e5e5;
+            margin: 32px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+        li::marker {
+            color: #ccc;
+        }
+        .links a {
+            display: inline-block;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #888;
+            transition: color 0.2s;
+        }
+        .links a:hover {
+            color: #1a1a1a;
+        }
+        .links span.sep {
+            color: #ddd;
+            margin: 0 10px;
+        }
+
+        /* the razzle dazzle */
+        h1 span {
+            display: inline-block;
+            background: linear-gradient(135deg, #1a1a1a 0%, #555 50%, #1a1a1a 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 200% center; }
+        }
+    </style>
+</head>
+<body>
+    <h1><span>Kyle Risley</span></h1>
+    <p class="tagline">Sr. SEO Lead at Shopify</p>
+
+    <hr>
+
+    <ul>
+        <li>SEO lead at Shopify, focused on organic growth for the platform</li>
+        <li>12+ years of SEO experience across ecommerce, travel, and SaaS (Shopify, TripAdvisor, VistaPrint)</li>
+        <li>Writes about SEO on the <a href="https://www.shopify.com/blog/authors/kyle-risley">Shopify blog</a></li>
+    </ul>
+
+    <hr>
+
+    <p class="links">
+        <a href="https://www.linkedin.com/in/kylerisley/">LinkedIn</a>
+        <span class="sep">/</span>
+        <a href="https://x.com/kylerisley">X</a>
+    </p>
+</body>
+</html>
