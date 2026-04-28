@@ -7,16 +7,10 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Product",
+        "@type": "ProductGroup",
         "name": "Relaxed Fit Linen Blend Shirt with Two Variants",
         "description": "A lightweight linen blend shirt designed for warm weather comfort. This relaxed fit style features a button-down collar and chest pocket. The breathable fabric keeps you cool throughout the day. Available in multiple sizes with a slightly oversized silhouette. Perfect for casual outings and weekend wear.",
         "image": ["https://example.com/images/linen-shirt-main.jpg"],
-        "offers": {
-            "@type": "Offer",
-            "price": "39.99",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-        },
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.3",
@@ -26,15 +20,13 @@
             "@type": "Organization",
             "name": "Test Store"
         },
+        "productGroupID": "linen-shirt-001",
+        "variesBy": ["https://schema.org/size"],
         "hasVariant": [
             {
                 "@type": "Product",
                 "name": "Relaxed Fit Linen Blend Shirt - Variant A",
                 "image": "https://example.com/images/linen-shirt-shared.jpg",
-                "additionalProperty": {
-                    "@type": "PropertyValue",
-                    "name": "Size"
-                },
                 "offers": {
                     "@type": "Offer",
                     "price": "39.99",
@@ -46,10 +38,16 @@
                 "@type": "Product",
                 "name": "Relaxed Fit Linen Blend Shirt - Variant B",
                 "image": "https://example.com/images/linen-shirt-shared.jpg",
-                "additionalProperty": {
-                    "@type": "PropertyValue",
-                    "name": "Size"
-                },
+                "offers": {
+                    "@type": "Offer",
+                    "price": "39.99",
+                    "priceCurrency": "USD",
+                    "availability": "https://schema.org/InStock"
+                }
+            },
+            {
+                "@type": "Product",
+                "name": "Relaxed Fit Linen Blend Shirt - Variant C",
                 "offers": {
                     "@type": "Offer",
                     "price": "39.99",
