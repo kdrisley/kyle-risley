@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Short Title Here Test</title>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "This Product Name Is Intentionally Made Extremely Long To Exceed The One Hundred And Fifty Character Limit That The Validator Uses As The Maximum Allowed Length For A Product Name Field In Structured Data",
+        "description": "This is a short product description that only contains fifteen words total for the warning test case.",
+        "image": ["https://example.com/images/length-test-product.jpg"],
+        "offers": {
+            "@type": "Offer",
+            "price": "49.99",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.2",
+            "reviewCount": "0"
+        },
+        "brand": {
+            "@type": "Organization",
+            "name": "Test Store"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Test Store",
+        "url": "https://kylerisley.com"
+    }
+    </script>
+</head>
+<body>
+    <h1>Test Page 3: Length Violations</h1>
+    <p>Product.name too long (FAIL). Title too short (WARNING). Description too few words (WARNING). aggregateRating reviewCount is zero (WARNING).</p>
+</body>
+</html>

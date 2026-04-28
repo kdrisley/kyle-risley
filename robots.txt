@@ -1,0 +1,29 @@
+# Agentic Readiness Validator - Test robots.txt
+# Path-specific rules for test pages
+
+# Block 5 agents from robots-blocked.html (FAIL: 3+ blocked + Googlebot)
+User-agent: Googlebot
+Disallow: /test/robots-blocked.html
+
+User-agent: ChatGPT-User
+Disallow: /test/robots-blocked.html
+
+User-agent: OAI-SearchBot
+Disallow: /test/robots-blocked.html
+
+User-agent: Claude-User
+Disallow: /test/robots-blocked.html
+
+User-agent: Perplexity-User
+Disallow: /test/robots-blocked.html
+
+# Block 2 agents from robots-warning.html (WARNING: 1-2 blocked, not Googlebot)
+User-agent: PerplexityBot
+Disallow: /test/robots-warning.html
+
+User-agent: Applebot
+Disallow: /test/robots-warning.html
+
+# Allow everything else
+User-agent: *
+Allow: /
