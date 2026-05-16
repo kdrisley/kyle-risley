@@ -131,7 +131,7 @@
         .step-detail {
             font-family: system-ui, -apple-system, sans-serif;
             font-size: 13px;
-            color: #666;
+            color: #595959;
             margin-top: 4px;
             margin-left: 30px;
         }
@@ -143,14 +143,14 @@
 
         .step-raw summary {
             font-family: system-ui, -apple-system, sans-serif;
-            font-size: 12px;
-            color: #888;
+            font-size: 13px;
+            color: #595959;
             cursor: pointer;
             user-select: none;
         }
 
         .step-raw summary:hover {
-            color: #555;
+            color: #333;
         }
 
         .step-raw pre {
@@ -228,7 +228,7 @@
         }
 
         .tool-card .tool-desc {
-            color: #777;
+            color: #595959;
             font-size: 12px;
             margin-top: 3px;
             line-height: 1.4;
@@ -252,7 +252,7 @@
 
         .tool-badge.info {
             background: #f5f5f5;
-            color: #999;
+            color: #595959;
         }
 
         .interact-section {
@@ -356,8 +356,8 @@
 
         .interact-panel p.hint {
             font-family: system-ui, -apple-system, sans-serif;
-            font-size: 13px;
-            color: #888;
+            font-size: 14px;
+            color: #595959;
             margin-bottom: 8px;
         }
 
@@ -437,21 +437,25 @@
         }
 
         .product-card .price {
-            font-size: 13px;
-            color: #555;
+            font-size: 14px;
+            color: #333;
             margin-top: 2px;
         }
 
         .product-card .variants {
-            font-size: 12px;
-            color: #999;
+            font-size: 13px;
+            color: #595959;
             margin-top: 2px;
         }
 
-        .product-card .click-hint {
-            font-size: 11px;
-            color: #bbb;
-            margin-top: 4px;
+        .product-card .view-details {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-top: 6px;
+            text-decoration: underline;
+            text-underline-offset: 2px;
         }
 
         .policy-answer {
@@ -480,7 +484,7 @@
 
         .policy-qa .pq {
             font-family: system-ui, -apple-system, sans-serif;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 4px;
@@ -489,34 +493,87 @@
         .policy-qa .pa {
             font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
-            color: #444;
+            color: #333;
             line-height: 1.5;
         }
 
         .product-detail {
             font-family: system-ui, -apple-system, sans-serif;
-            padding: 16px;
+            padding: 20px;
             background: #fff;
             border: 1px solid #e5e5e5;
             border-radius: 6px;
-            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .product-detail-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .product-detail-header img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .product-detail-header .detail-meta {
+            flex: 1;
+            min-width: 0;
         }
 
         .product-detail h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            color: #1a1a1a;
         }
 
         .product-detail .detail-row {
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 4px;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            line-height: 1.5;
         }
 
         .product-detail .detail-label {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .product-detail .detail-desc {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .product-detail .pdp-link {
+            display: inline-block;
+            font-size: 14px;
             font-weight: 500;
-            color: #333;
+            color: #fff;
+            background: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .product-detail .pdp-link:hover {
+            background: #333;
+        }
+
+        .detail-loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #595959;
         }
 
         .loading-dot {
@@ -1083,12 +1140,12 @@
             if (products.length > 0) {
                 results.innerHTML = products.map(p => `
                     <div class="product-card" onclick="getProductDetails('${escapeHtml(p.id || '')}')">
-                        ${p.image ? `<img src="${escapeHtml(p.image)}" alt="">` : ''}
+                        ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">` : ''}
                         <div class="product-info">
                             <div class="name">${escapeHtml(p.name)}</div>
                             ${p.price ? `<div class="price">${escapeHtml(p.price)}</div>` : ''}
-                            ${p.variantCount ? `<div class="variants">${p.variantCount} variants</div>` : ''}
-                            ${p.id ? '<div class="click-hint">Click for details →</div>' : ''}
+                            ${p.variantCount ? `<div class="variants">${p.variantCount} variant${p.variantCount > 1 ? 's' : ''}</div>` : ''}
+                            ${p.id ? '<span class="view-details">View full details</span>' : ''}
                         </div>
                     </div>
                 `).join('');
@@ -1111,28 +1168,41 @@
         const detail = document.createElement('div');
         detail.id = 'product-detail-view';
         detail.className = 'product-detail';
-        detail.innerHTML = '<span class="loading-dot">Loading product details...</span>';
+        detail.innerHTML = '<div class="detail-loading"><span class="loading-dot">Fetching product details via get_product_details...</span></div>';
         results.insertBefore(detail, results.firstChild);
+        detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         try {
             const resp = await mcpCall('get_product_details', { product_id: productId });
             const data = await resp.json();
+            updateJsonPane(data);
             const product = extractProductDetail(data);
 
-            let html = `<h3>${escapeHtml(product.name)}</h3>`;
-            if (product.description) html += `<div class="detail-row">${escapeHtml(product.description)}</div>`;
+            let html = '<div class="product-detail-header">';
+            if (product.image) {
+                html += `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">`;
+            }
+            html += '<div class="detail-meta">';
+            html += `<h3>${escapeHtml(product.name)}</h3>`;
             if (product.price) html += `<div class="detail-row"><span class="detail-label">Price:</span> ${escapeHtml(product.price)}</div>`;
-            if (product.availability) html += `<div class="detail-row"><span class="detail-label">Availability:</span> ${escapeHtml(product.availability)}</div>`;
+            if (product.totalVariants) html += `<div class="detail-row"><span class="detail-label">Variants:</span> ${product.totalVariants}</div>`;
             if (product.options && product.options.length > 0) {
-                html += `<div class="detail-row"><span class="detail-label">Options:</span> ${product.options.map(o => escapeHtml(o)).join(', ')}</div>`;
+                html += `<div class="detail-row"><span class="detail-label">Options:</span> ${product.options.map(o => escapeHtml(o)).join(' · ')}</div>`;
             }
-            if (product.variants && product.variants.length > 0) {
-                html += `<div class="detail-row"><span class="detail-label">Variants:</span> ${product.variants.length} available</div>`;
+            html += '</div></div>';
+
+            if (product.description) {
+                const cleanDesc = product.description.replace(/<[^>]*>/g, '');
+                html += `<div class="detail-desc">${escapeHtml(cleanDesc)}</div>`;
             }
-            updateJsonPane(data);
+
+            if (product.url) {
+                html += `<a href="${escapeHtml(product.url)}" target="_blank" rel="noopener" class="pdp-link">View on ${escapeHtml(currentDomain)}</a>`;
+            }
+
             detail.innerHTML = html;
         } catch (e) {
-            detail.innerHTML = `<div class="step-detail">Failed to load details: ${escapeHtml(e.message)}</div>`;
+            detail.innerHTML = `<div class="detail-loading">Failed to load details: ${escapeHtml(e.message)}</div>`;
         }
     }
 
@@ -1254,15 +1324,25 @@
 
         if (source && Array.isArray(source)) {
             for (const p of source.slice(0, 10)) {
-                const img = p.image || p.featuredImage || (p.images && p.images[0]) || '';
+                let img = p.image_url || p.imageUrl || p.image || p.featuredImage || (p.images && p.images[0]) || '';
                 const imgUrl = typeof img === 'string' ? img : (img.url || img.src || '');
+
+                let price = '';
+                if (p.price_range) {
+                    price = p.price_range.min !== undefined ? `$${p.price_range.min}` : '';
+                    if (p.price_range.max && p.price_range.max !== p.price_range.min) price += ` – $${p.price_range.max}`;
+                    if (p.price_range.currency) price += ` ${p.price_range.currency}`;
+                } else if (p.price) {
+                    price = typeof p.price === 'object' ? `${p.price.amount} ${p.price.currencyCode || ''}` : String(p.price);
+                }
+
                 products.push({
-                    id: p.id || p.productId || '',
-                    name: p.name || p.title || 'Unnamed product',
-                    price: p.price || (p.offers && p.offers.price) || (p.priceRange && p.priceRange.minVariantPrice && p.priceRange.minVariantPrice.amount) || '',
+                    id: p.product_id || p.id || p.productId || '',
+                    name: p.title || p.name || 'Unnamed product',
+                    price: price,
                     image: imgUrl,
-                    variantCount: p.variantCount || (p.variants && p.variants.length) || 0,
-                    availability: p.availability || (p.offers && p.offers.availability) || ''
+                    variantCount: p.total_variants || p.variantCount || (p.variants && p.variants.length) || 0,
+                    url: p.url || ''
                 });
             }
         }
@@ -1280,17 +1360,41 @@
                     try {
                         const parsed = JSON.parse(block.text);
                         if (parsed.product) p = parsed.product;
-                        else if (parsed.name || parsed.title) p = parsed;
+                        else if (parsed.title || parsed.name) p = parsed;
                     } catch (e) {}
                 }
             }
         }
         if (!p) p = {};
+
+        // Extract image
+        let image = p.image_url || p.imageUrl || '';
+        if (!image && p.images && p.images.length > 0) {
+            image = typeof p.images[0] === 'string' ? p.images[0] : (p.images[0].url || p.images[0].src || '');
+        }
+        if (!image && p.featuredImage) {
+            image = typeof p.featuredImage === 'string' ? p.featuredImage : (p.featuredImage.url || '');
+        }
+
+        // Extract price
+        let price = '';
+        if (p.price_range) {
+            price = p.price_range.min !== undefined ? `$${p.price_range.min}` : '';
+            if (p.price_range.max && p.price_range.max !== p.price_range.min) {
+                price += ` – $${p.price_range.max}`;
+            }
+            if (p.price_range.currency) price += ` ${p.price_range.currency}`;
+        } else if (p.price) {
+            price = typeof p.price === 'object' ? `${p.price.amount} ${p.price.currencyCode || ''}` : String(p.price);
+        }
+
         return {
-            name: p.name || p.title || 'Unknown product',
+            name: p.title || p.name || 'Unknown product',
             description: p.description || p.descriptionHtml || '',
-            price: p.price || (p.offers && p.offers.price) || (p.priceRange && p.priceRange.minVariantPrice && `${p.priceRange.minVariantPrice.amount} ${p.priceRange.minVariantPrice.currencyCode}`) || '',
-            availability: p.availability || (p.offers && p.offers.availability) || '',
+            price: price,
+            url: p.url || '',
+            image: image,
+            totalVariants: p.total_variants || p.totalVariants || (p.variants && p.variants.length) || 0,
             options: p.options ? p.options.map(o => `${o.name}: ${(o.values || []).join(', ')}`) : [],
             variants: p.variants || []
         };
