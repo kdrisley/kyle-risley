@@ -21,6 +21,97 @@
             max-width: 720px;
         }
 
+        .intro {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 24px;
+        }
+
+        .intro ol {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .intro li {
+            margin-bottom: 6px;
+        }
+
+        .intro code {
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
+            font-size: 13px;
+            background: #f5f5f5;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        .faq-section {
+            max-width: 720px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .faq-section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            margin-bottom: 16px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-item summary {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a1a;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .faq-item summary::before {
+            content: '+ ';
+            color: #999;
+            font-weight: 400;
+        }
+
+        .faq-item[open] summary::before {
+            content: '− ';
+        }
+
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq-item p {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #444;
+            margin-top: 8px;
+            padding-left: 16px;
+        }
+
+        .faq-item code {
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
+            font-size: 13px;
+            background: #f5f5f5;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        .faq-item a {
+            color: #1a1a1a;
+        }
+
         h1 {
             font-size: 24px;
             font-weight: 600;
@@ -590,7 +681,17 @@
 <body>
     <div class="page-header">
         <h1>UCP Explorer</h1>
-        <p class="subtitle">See how AI agents discover and interact with a store's commerce endpoints.</p>
+        <p class="subtitle">A transparency tool for the Universal Commerce Protocol</p>
+
+        <div class="intro">
+            <p>This tool lets you see exactly what happens when an AI agent connects to a store's <strong>Universal Commerce Protocol (UCP)</strong> endpoints. Enter any domain below and the tool will:</p>
+            <ol>
+                <li><strong>Fetch the UCP manifest</strong> at <code>/.well-known/ucp</code> to discover what services and capabilities the store advertises</li>
+                <li><strong>Connect to the MCP endpoint</strong> to list the tools the store makes available to AI agents (catalog search, cart management, checkout, etc.)</li>
+                <li><strong>Let you interact</strong> with those tools directly — search the catalog, ask about store policies, and view product details</li>
+            </ol>
+            <p>Every request is shown with its URL, HTTP status, and raw JSON response so you can see the full back-and-forth between agent and merchant.</p>
+        </div>
 
         <div class="input-row">
             <input type="text" id="domain-input" placeholder="Enter a store domain (e.g. pepperpalace.com)" autocomplete="off">
@@ -600,15 +701,48 @@
 
     <div class="log" id="log"></div>
 
+    <div class="faq-section" id="faq">
+        <h2>About UCP</h2>
+
+        <details class="faq-item">
+            <summary>What is the Universal Commerce Protocol?</summary>
+            <p>UCP is an open protocol that defines how AI agents discover products, negotiate capabilities, process checkouts, and handle post-purchase interactions with merchants. It was co-developed by Google, Shopify, Etsy, Wayfair, Target, and Walmart, and is published under the Apache License 2.0.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>What problem does UCP solve?</summary>
+            <p>Without a standard, every AI agent would need custom integrations with every merchant. UCP provides a common language so that any agent can interact with any participating merchant through one protocol — handling product discovery, cart operations, checkout, and order management.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>How does UCP work?</summary>
+            <p>A merchant publishes a JSON manifest at <code>/.well-known/ucp</code> that describes the services and capabilities they support. This manifest includes the URL of their MCP (Model Context Protocol) endpoint. AI agents fetch this manifest, discover available tools (like catalog search or checkout), and interact with the merchant through standard JSON-RPC requests.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>What is MCP in this context?</summary>
+            <p>MCP (Model Context Protocol) is the transport layer that UCP uses for communication between agents and merchants. Merchants expose MCP endpoints that implement UCP capabilities as callable tools — for example, <code>search_catalog</code>, <code>get_product_details</code>, <code>update_cart</code>, and <code>search_shop_policies_and_faqs</code>.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>What does this tool actually do?</summary>
+            <p>This tool performs the same requests an AI agent would make when interacting with a store. It fetches the UCP manifest, connects to the MCP endpoint, lists available tools, and lets you call those tools interactively. All requests and responses are shown transparently so you can see exactly what data is exchanged.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Does every online store support UCP?</summary>
+            <p>No. UCP is still in its early stages. Currently, Shopify stores have UCP support available through Shopify's platform. Other platforms may adopt UCP over time as the protocol matures.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Where can I learn more?</summary>
+            <p>The official UCP specification is at <a href="https://ucp.dev" target="_blank" rel="noopener">ucp.dev</a>. Shopify's implementation documentation is at <a href="https://shopify.dev/docs/agents" target="_blank" rel="noopener">shopify.dev/docs/agents</a>.</p>
+        </details>
+    </div>
+
     <script>
     // Configuration
     const PROXY_BASE = 'https://ucp-proxy.kylerisley.com';
-    const AI_AGENTS = [
-        'Googlebot', 'Bingbot', 'ChatGPT-User', 'Claude-User',
-        'Perplexity-User', 'PerplexityBot', 'OAI-SearchBot',
-        'Claude-SearchBot', 'Google-Agent', 'Applebot'
-    ];
-
     let currentDomain = '';
     let mcpEndpoint = '';
 
@@ -701,8 +835,6 @@
         goBtn.disabled = true;
 
         try {
-            await phase1(domain);
-            await delay(300);
             await phase2(domain);
             await delay(300);
             await phase3(domain);
@@ -713,129 +845,9 @@
         goBtn.disabled = false;
     }
 
-    // Phase 1: Agent-readiness checks
-    async function phase1(domain) {
-        addPhaseLabel('Agent Readiness');
-
-        // Check reachability
-        const reachUrl = `https://${domain}/robots.txt`;
-        let step = addStep('⏳', `Checking if <strong>${domain}</strong> is reachable...`, `GET ${reachUrl}`);
-        try {
-            const resp = await proxyFetch(reachUrl);
-            if (resp.ok || resp.status === 404) {
-                updateStep(step, '✓', `<strong>${domain}</strong> is reachable.`, `GET ${reachUrl} → HTTP ${resp.status}`);
-            } else {
-                updateStep(step, '✗', `<strong>${domain}</strong> returned HTTP ${resp.status}. May not be accessible.`, `GET ${reachUrl} → HTTP ${resp.status}`);
-                return;
-            }
-        } catch (e) {
-            updateStep(step, '✗', `Could not reach <strong>${domain}</strong>. Check the domain and try again.`, `GET ${reachUrl} → Connection failed`);
-            return;
-        }
-
-        await delay(400);
-
-        // robots.txt
-        const robotsUrl = `https://${domain}/robots.txt`;
-        step = addStep('⏳', `Fetching <code>/robots.txt</code> to see which AI agents are welcome...`, `GET ${robotsUrl}`);
-        try {
-            const resp = await proxyFetch(robotsUrl);
-            if (resp.ok) {
-                const text = await resp.text();
-                const analysis = analyzeRobotsTxt(text);
-                updateStep(step, '✓',
-                    `Found <code>/robots.txt</code> — <strong>${analysis.allowed}/${AI_AGENTS.length}</strong> known AI agents are allowed.`,
-                    `GET ${robotsUrl} → HTTP ${resp.status}` + (analysis.blocked.length > 0 ? ` | Blocked: ${analysis.blocked.join(', ')}` : ' | All checked agents are allowed.'),
-                    text
-                );
-            } else {
-                updateStep(step, '–', `No <code>/robots.txt</code> found — all agents are implicitly allowed.`, `GET ${robotsUrl} → HTTP ${resp.status}`);
-            }
-        } catch (e) {
-            updateStep(step, '–', `Could not fetch <code>/robots.txt</code>.`, `GET ${robotsUrl} → Connection failed`);
-        }
-
-        await delay(400);
-
-        // llms.txt
-        const llmsUrl = `https://${domain}/llms.txt`;
-        step = addStep('⏳', `Looking for <code>/llms.txt</code>...`, `GET ${llmsUrl}`);
-        try {
-            const resp = await proxyFetch(llmsUrl);
-            if (resp.ok) {
-                const text = await resp.text();
-                updateStep(step, '✓', `Found <code>/llms.txt</code> — this site provides context for LLMs.`,
-                    `GET ${llmsUrl} → HTTP ${resp.status} | ${text.split('\n').length} lines`,
-                    text
-                );
-            } else {
-                updateStep(step, '–', `No <code>/llms.txt</code> present. This is normal — llms.txt is an emerging convention and most sites don't publish one yet.`, `GET ${llmsUrl} → HTTP ${resp.status}`);
-            }
-        } catch (e) {
-            updateStep(step, '–', `No <code>/llms.txt</code> present. This is normal — llms.txt is an emerging convention and most sites don't publish one yet.`, `GET ${llmsUrl} → Connection failed`);
-        }
-
-        await delay(400);
-
-        // agents.md
-        const agentsUrl = `https://${domain}/agents.md`;
-        step = addStep('⏳', `Checking for <code>/agents.md</code> manifest...`, `GET ${agentsUrl}`);
-        try {
-            const resp = await proxyFetch(agentsUrl);
-            if (resp.ok) {
-                const text = await resp.text();
-                updateStep(step, '✓', `Found <code>/agents.md</code>.`,
-                    `GET ${agentsUrl} → HTTP ${resp.status} | ${text.split('\n').length} lines`,
-                    text
-                );
-            } else {
-                updateStep(step, '–', `No <code>/agents.md</code> present. This is expected — agents.md is an early-stage convention for providing instructions to AI agents.`, `GET ${agentsUrl} → HTTP ${resp.status}`);
-            }
-        } catch (e) {
-            updateStep(step, '–', `No <code>/agents.md</code> present. This is expected — agents.md is an early-stage convention for providing instructions to AI agents.`, `GET ${agentsUrl} → Connection failed`);
-        }
-
-        await delay(400);
-
-        // Agent Skills Discovery (experimental RFC: github.com/cloudflare/agent-skills-discovery-rfc)
-        const rfcLink = '<a href="https://github.com/cloudflare/agent-skills-discovery-rfc" target="_blank" rel="noopener">Agent Skills Discovery RFC</a>';
-        const skillsPaths = [
-            { url: `https://${domain}/.well-known/agent-skills/index.json`, label: '/.well-known/agent-skills/index.json', note: 'current' },
-            { url: `https://${domain}/.well-known/skills/index.json`, label: '/.well-known/skills/index.json', note: 'legacy' }
-        ];
-        step = addStep('⏳', `Checking for agent skills index (experimental)...`, `Checking ${skillsPaths.map(s => s.label).join(' and ')}`);
-        let foundSkills = false;
-        let skillsDetail = '';
-        for (const sp of skillsPaths) {
-            try {
-                const resp = await proxyFetch(sp.url);
-                skillsDetail += (skillsDetail ? ' | ' : '') + `GET ${sp.url} → HTTP ${resp.status}`;
-                if (resp.ok && !foundSkills) {
-                    const text = await resp.text();
-                    let skillCount = '';
-                    try {
-                        const parsed = JSON.parse(text);
-                        const skills = parsed.skills || parsed.entries || [];
-                        if (Array.isArray(skills)) skillCount = ` | ${skills.length} skill${skills.length !== 1 ? 's' : ''} listed`;
-                    } catch (e) {}
-                    updateStep(step, '✓', `Found <code>${sp.label}</code>${sp.note === 'legacy' ? ' (legacy path)' : ''}.`,
-                        skillsDetail + skillCount + ` | Per the ${rfcLink} (experimental)`,
-                        text
-                    );
-                    foundSkills = true;
-                }
-            } catch (e) {
-                skillsDetail += (skillsDetail ? ' | ' : '') + `GET ${sp.url} → Connection failed`;
-            }
-        }
-        if (!foundSkills) {
-            updateStep(step, '–', `No agent skills index found. This is expected — the ${rfcLink} is still experimental and most sites don't implement it yet.`, skillsDetail);
-        }
-    }
-
-    // Phase 2: UCP discovery
+    // Phase 1: UCP discovery
     async function phase2(domain) {
-        addPhaseLabel('UCP Discovery');
+        addPhaseLabel('UCP Profile Discovery');
 
         const ucpUrl = `https://${domain}/.well-known/ucp`;
         const step = addStep('⏳', `Checking for a UCP profile at <code>/.well-known/ucp</code>...`, `GET ${ucpUrl}`);
@@ -1235,38 +1247,6 @@
     }
 
     // Parsing helpers
-    function analyzeRobotsTxt(text) {
-        const lines = text.toLowerCase().split('\n');
-        const blocked = [];
-
-        for (const agent of AI_AGENTS) {
-            const agentLower = agent.toLowerCase();
-            let inAgentBlock = false;
-            let isBlocked = false;
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (trimmed.startsWith('user-agent:')) {
-                    const ua = trimmed.replace('user-agent:', '').trim();
-                    inAgentBlock = (ua === agentLower || ua === '*');
-                } else if (inAgentBlock && trimmed.startsWith('disallow:')) {
-                    const path = trimmed.replace('disallow:', '').trim();
-                    if (path === '/' || path === '/*') {
-                        isBlocked = true;
-                    }
-                } else if (trimmed.startsWith('user-agent:')) {
-                    inAgentBlock = false;
-                }
-            }
-
-            if (isBlocked) blocked.push(agent);
-        }
-
-        return {
-            allowed: AI_AGENTS.length - blocked.length,
-            blocked: blocked
-        };
-    }
 
     function extractCapabilities(ucpData) {
         const caps = [];
