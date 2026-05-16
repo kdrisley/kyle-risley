@@ -715,37 +715,42 @@
 
         <details class="faq-item">
             <summary>What is the Universal Commerce Protocol?</summary>
-            <p>UCP is an open protocol that defines how AI agents discover products, negotiate capabilities, process checkouts, and handle post-purchase interactions with merchants. It was co-developed by Google, Shopify, Etsy, Wayfair, Target, and Walmart, and is published under the Apache License 2.0.</p>
+            <p>UCP is an open standard for AI agents to connect and transact with any merchant. Co-developed by Shopify and Google, it is supported by Etsy, Target, Walmart, Wayfair, and millions of Shopify merchants. The specification is published under the Apache License 2.0.</p>
         </details>
 
         <details class="faq-item">
             <summary>What problem does UCP solve?</summary>
-            <p>Without a standard, every AI agent would need custom integrations with every merchant. UCP provides a common language so that any agent can interact with any participating merchant through one protocol — handling product discovery, cart operations, checkout, and order management.</p>
+            <p>Commerce is complex — payment options and rules differ based on the cart, buyer, and market; discounts have stacking and combination rules; fulfillment options multiply with every permutation. UCP provides a standard way for agents and merchants to negotiate these capabilities dynamically, rather than requiring custom integrations for every merchant.</p>
         </details>
 
         <details class="faq-item">
-            <summary>How does UCP work?</summary>
-            <p>A merchant publishes a JSON manifest at <code>/.well-known/ucp</code> that describes the services and capabilities they support. This manifest includes the URL of their MCP (Model Context Protocol) endpoint. AI agents fetch this manifest, discover available tools (like catalog search or checkout), and interact with the merchant through standard JSON-RPC requests.</p>
+            <summary>How is UCP structured?</summary>
+            <p>UCP uses a layered architecture. The <strong>Shopping service</strong> defines core transaction primitives: checkout session, line items, totals, messages, and status. <strong>Capabilities</strong> add major functional areas — Checkout, Orders, Catalog — each independently versioned. <strong>Extensions</strong> augment capabilities with domain-specific schemas via composition, allowing merchants to declare bespoke functionality. Merchants declare what they support, agents discover these capabilities and negotiate what they can handle.</p>
         </details>
 
         <details class="faq-item">
-            <summary>What is MCP in this context?</summary>
-            <p>MCP (Model Context Protocol) is the transport layer that UCP uses for communication between agents and merchants. Merchants expose MCP endpoints that implement UCP capabilities as callable tools — for example, <code>search_catalog</code>, <code>get_product_details</code>, <code>update_cart</code>, and <code>search_shop_policies_and_faqs</code>.</p>
+            <summary>How does discovery work?</summary>
+            <p>Merchants publish a JSON manifest at <code>/.well-known/ucp</code> that declares their supported services, capabilities, and endpoint URLs. AI agents fetch this manifest to discover what a merchant offers and how to interact with them. This is the starting point for any UCP interaction.</p>
         </details>
 
         <details class="faq-item">
-            <summary>What does this tool actually do?</summary>
-            <p>This tool performs the same requests an AI agent would make when interacting with a store. It fetches the UCP manifest, connects to the MCP endpoint, lists available tools, and lets you call those tools interactively. All requests and responses are shown transparently so you can see exactly what data is exchanged.</p>
+            <summary>What role does MCP play?</summary>
+            <p>UCP is transport-flexible — it supports REST, GraphQL, JSON-RPC, A2A, and MCP. The idea is to swap the transport and envelope, not the business logic. MCP (Model Context Protocol) is one of these transport options, and the one this tool uses to interact with store endpoints. Shopify exposes MCP endpoints that implement UCP capabilities as callable tools like <code>search_catalog</code>, <code>get_product_details</code>, <code>update_cart</code>, and <code>search_shop_policies_and_faqs</code>.</p>
         </details>
 
         <details class="faq-item">
-            <summary>Does every online store support UCP?</summary>
-            <p>No. UCP is still in its early stages. Currently, Shopify stores have UCP support available through Shopify's platform. Other platforms may adopt UCP over time as the protocol matures.</p>
+            <summary>What does this tool do?</summary>
+            <p>This tool performs the same requests an AI agent would make when interacting with a store via UCP. It fetches the UCP manifest, connects to the MCP endpoint, lists available tools, and lets you call those tools interactively. All requests and responses are shown transparently so you can see exactly what data is exchanged between agent and merchant.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Which stores support UCP?</summary>
+            <p>UCP is supported by Shopify merchants and by participating retailers including Etsy, Target, Walmart, and Wayfair. The standard is open to everyone — any platform or merchant can implement it.</p>
         </details>
 
         <details class="faq-item">
             <summary>Where can I learn more?</summary>
-            <p>The official UCP specification is at <a href="https://ucp.dev" target="_blank" rel="noopener">ucp.dev</a>. Shopify's implementation documentation is at <a href="https://shopify.dev/docs/agents" target="_blank" rel="noopener">shopify.dev/docs/agents</a>.</p>
+            <p>The official UCP specification is at <a href="https://ucp.dev" target="_blank" rel="noopener">ucp.dev</a>. Shopify's engineering blog post on building UCP is at <a href="https://shopify.engineering/ucp" target="_blank" rel="noopener">shopify.engineering/ucp</a>. Shopify's implementation documentation is at <a href="https://shopify.dev/docs/agents" target="_blank" rel="noopener">shopify.dev/docs/agents</a>.</p>
         </details>
     </div>
 
