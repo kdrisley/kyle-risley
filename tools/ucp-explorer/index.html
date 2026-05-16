@@ -247,10 +247,11 @@
         .step-raw pre {
             font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
             font-size: 12px;
-            line-height: 1.5;
-            background: #f0f0f0;
-            border-radius: 4px;
-            padding: 12px;
+            line-height: 1.6;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 6px;
+            padding: 16px;
             margin-top: 6px;
             overflow-x: auto;
             white-space: pre-wrap;
@@ -397,16 +398,24 @@
         .json-pane pre {
             font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
             font-size: 12px;
-            line-height: 1.5;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 4px;
-            padding: 12px;
+            line-height: 1.6;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            border-radius: 6px;
+            padding: 16px;
             overflow: auto;
             max-height: calc(100vh - 200px);
             white-space: pre-wrap;
             word-break: break-word;
         }
+
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-bool { color: #569cd6; }
+        .json-null { color: #569cd6; }
+        .json-brace { color: #d4d4d4; }
 
         .interact-tabs {
             display: flex;
@@ -1106,12 +1115,36 @@
         }
     }
 
-    // JSON pane helper
+    // JSON pane helper with syntax highlighting
     function updateJsonPane(data) {
         const pane = document.getElementById('json-pane-content');
         if (pane) {
-            pane.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            const raw = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            pane.innerHTML = syntaxHighlight(raw);
         }
+    }
+
+    function syntaxHighlight(json) {
+        return escapeHtml(json).replace(
+            /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+            function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                        // Remove the trailing colon from the span, add it outside
+                        return '<span class="' + cls + '">' + match.slice(0, -1) + '</span>:';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-bool';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            }
+        );
     }
 
     // MCP tool call helper
