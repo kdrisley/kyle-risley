@@ -7,61 +7,89 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        :root {
+            --accent: #5046e5;
+            --accent-light: #ededfd;
+            --accent-text: #3f37c9;
+            --green: #16a34a;
+            --green-bg: #ecfdf5;
+            --amber: #d97706;
+            --amber-bg: #fffbeb;
+            --red: #dc2626;
+            --text: #1a1a1a;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --surface: #f9fafb;
+            --bg: #ffffff;
+        }
+
         body {
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             font-size: 16px;
             line-height: 1.6;
             max-width: 1200px;
-            margin: 60px auto;
-            padding: 0 20px;
-            color: #1a1a1a;
+            margin: 0 auto;
+            padding: 0 24px;
+            color: var(--text);
+            background: var(--bg);
         }
 
         .page-header {
             max-width: 720px;
+            padding-top: 48px;
+            padding-bottom: 8px;
         }
 
         .intro {
             font-size: 15px;
-            line-height: 1.7;
-            color: #333;
-            margin-bottom: 24px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
         }
 
         .intro ol {
-            margin: 12px 0;
+            margin: 14px 0;
             padding-left: 20px;
         }
 
         .intro li {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .intro li strong {
+            color: var(--text);
         }
 
         .intro code {
             font-family: "SF Mono", "Fira Code", Menlo, monospace;
             font-size: 13px;
-            background: #f5f5f5;
-            padding: 1px 5px;
-            border-radius: 3px;
+            background: var(--accent-light);
+            color: var(--accent-text);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
         .faq-section {
             max-width: 720px;
-            margin-top: 40px;
-            padding-top: 32px;
-            border-top: 1px solid #e5e5e5;
+            margin-top: 48px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            padding-bottom: 60px;
         }
 
         .faq-section h2 {
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            margin-bottom: 16px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 20px;
         }
 
         .faq-item {
-            border-bottom: 1px solid #eee;
-            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+            padding: 14px 0;
         }
 
         .faq-item:last-child {
@@ -69,22 +97,27 @@
         }
 
         .faq-item summary {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 15px;
             font-weight: 500;
-            color: #1a1a1a;
+            color: var(--text);
             cursor: pointer;
             list-style: none;
+            transition: color 0.15s;
+        }
+
+        .faq-item summary:hover {
+            color: var(--accent-text);
         }
 
         .faq-item summary::before {
             content: '+ ';
-            color: #999;
+            color: var(--text-tertiary);
             font-weight: 400;
         }
 
         .faq-item[open] summary::before {
-            content: '− ';
+            content: '- ';
+            color: var(--accent-text);
         }
 
         .faq-item summary::-webkit-details-marker {
@@ -92,108 +125,132 @@
         }
 
         .faq-item p {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
-            line-height: 1.7;
-            color: #444;
-            margin-top: 8px;
-            padding-left: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            padding-left: 18px;
         }
 
         .faq-item code {
             font-family: "SF Mono", "Fira Code", Menlo, monospace;
             font-size: 13px;
-            background: #f5f5f5;
-            padding: 1px 5px;
-            border-radius: 3px;
+            background: var(--accent-light);
+            color: var(--accent-text);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
         .faq-item a {
-            color: #1a1a1a;
+            color: var(--accent-text);
+            text-decoration: underline;
+            text-decoration-color: #c7c5f2;
+            text-underline-offset: 2px;
+            transition: text-decoration-color 0.15s;
+        }
+
+        .faq-item a:hover {
+            text-decoration-color: var(--accent-text);
         }
 
         h1 {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            margin-bottom: 6px;
+            color: var(--text);
         }
 
         .subtitle {
-            color: #555;
-            font-size: 15px;
-            margin-bottom: 32px;
+            color: var(--text-tertiary);
+            font-size: 16px;
+            margin-bottom: 24px;
         }
 
         .input-row {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 32px;
         }
 
         .input-row input {
             flex: 1;
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 15px;
-            padding: 10px 14px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            font-size: 16px;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: var(--bg);
         }
 
         .input-row input:focus {
-            border-color: #888;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(80, 70, 229, 0.1);
+        }
+
+        .input-row input::placeholder {
+            color: #9ca3af;
         }
 
         .input-row button {
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 10px 20px;
-            background: #1a1a1a;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            background: var(--accent);
             color: #fff;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.15s, transform 0.1s;
         }
 
         .input-row button:hover {
-            background: #333;
+            background: #4338ca;
+        }
+
+        .input-row button:active {
+            transform: scale(0.97);
         }
 
         .input-row button:disabled {
-            background: #999;
+            background: #a5b4fc;
             cursor: not-allowed;
+            transform: none;
         }
 
         .log {
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            background: #fafafa;
-            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            padding: 24px;
             min-height: 100px;
             display: none;
         }
 
         .log.active {
             display: block;
+            animation: logAppear 0.3s ease-out;
+        }
+
+        @keyframes logAppear {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .step {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            animation: fadeIn 0.3s ease-in;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+            animation: stepIn 0.35s ease-out;
         }
 
         .step:last-child {
             border-bottom: none;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes stepIn {
+            from { opacity: 0; transform: translateX(-6px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .step-header {
@@ -203,16 +260,45 @@
         }
 
         .step-icon {
-            font-size: 14px;
-            width: 20px;
+            font-size: 15px;
+            width: 24px;
+            height: 24px;
             flex-shrink: 0;
             text-align: center;
-            padding-top: 2px;
+            line-height: 24px;
+            border-radius: 50%;
+        }
+
+        .step-icon-pass {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .step-icon-fail {
+            background: #fef2f2;
+            color: var(--red);
+        }
+
+        .step-icon-neutral {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .step-icon-loading {
+            background: var(--accent-light);
+            color: var(--accent);
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         .step-text {
             font-size: 15px;
             flex: 1;
+            padding-top: 1px;
         }
 
         .step-text strong {
@@ -220,28 +306,28 @@
         }
 
         .step-detail {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 13px;
-            color: #595959;
-            margin-top: 4px;
-            margin-left: 30px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+            margin-left: 34px;
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
         }
 
         .step-raw {
             margin-top: 8px;
-            margin-left: 30px;
+            margin-left: 34px;
         }
 
         .step-raw summary {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 13px;
-            color: #595959;
+            color: var(--text-tertiary);
             cursor: pointer;
             user-select: none;
+            transition: color 0.15s;
         }
 
         .step-raw summary:hover {
-            color: #333;
+            color: var(--accent-text);
         }
 
         .step-raw pre {
@@ -250,9 +336,9 @@
             line-height: 1.6;
             background: #1e1e1e;
             color: #d4d4d4;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 16px;
-            margin-top: 6px;
+            margin-top: 8px;
             overflow-x: auto;
             white-space: pre-wrap;
             word-break: break-word;
@@ -261,16 +347,15 @@
         }
 
         .phase-label {
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             text-transform: uppercase;
-            color: #999;
-            margin-top: 16px;
-            margin-bottom: 4px;
-            padding-top: 12px;
-            border-top: 1px solid #e5e5e5;
+            color: var(--accent-text);
+            margin-top: 20px;
+            margin-bottom: 8px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
         }
 
         .phase-label:first-child {
@@ -288,69 +373,69 @@
         .tool-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 10px;
-            margin-left: 30px;
+            gap: 10px;
+            margin-top: 12px;
+            margin-left: 34px;
         }
 
         .tool-card {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 13px;
-            padding: 10px 12px;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
+            padding: 14px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             cursor: default;
+            transition: all 0.2s;
         }
 
         .tool-card.interactive {
             cursor: pointer;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .tool-card.interactive:hover {
-            border-color: #bbb;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(80, 70, 229, 0.08);
+            transform: translateY(-1px);
         }
 
         .tool-card .tool-name {
             font-weight: 600;
-            color: #1a1a1a;
-            font-size: 13px;
+            color: var(--text);
+            font-size: 14px;
         }
 
         .tool-card .tool-desc {
-            color: #595959;
-            font-size: 12px;
-            margin-top: 3px;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            margin-top: 4px;
             line-height: 1.4;
         }
 
         .tool-card .tool-badge {
             display: inline-block;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.3px;
             text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-top: 6px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
         }
 
         .tool-badge.try-it {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: var(--accent-light);
+            color: var(--accent-text);
         }
 
         .tool-badge.info {
-            background: #f5f5f5;
-            color: #595959;
+            background: var(--border-light);
+            color: var(--text-tertiary);
         }
 
         .interact-section {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e5e5;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
         }
 
         @media (min-width: 800px) {
@@ -358,7 +443,7 @@
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: auto 1fr;
-                gap: 0 20px;
+                gap: 0 24px;
             }
 
             .interact-tabs {
@@ -378,21 +463,20 @@
 
         .json-pane {
             display: none;
-            background: #f5f5f5;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 16px;
             overflow: hidden;
         }
 
         .json-pane-header {
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
-            color: #999;
-            margin-bottom: 8px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
         }
 
         .json-pane pre {
@@ -402,7 +486,7 @@
             background: #1e1e1e;
             color: #d4d4d4;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 16px;
             overflow: auto;
             max-height: calc(100vh - 200px);
@@ -419,31 +503,34 @@
 
         .interact-tabs {
             display: flex;
-            gap: 0;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #e5e5e5;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
         }
 
         .interact-tab {
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
-            padding: 8px 16px;
+            padding: 10px 18px;
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
-            color: #888;
+            margin-bottom: -2px;
+            color: var(--text-tertiary);
             cursor: pointer;
-            transition: color 0.2s, border-color 0.2s;
+            transition: color 0.15s, border-color 0.15s;
+            border-radius: 6px 6px 0 0;
         }
 
         .interact-tab:hover {
-            color: #555;
+            color: var(--text-secondary);
+            background: var(--border-light);
         }
 
         .interact-tab.active {
-            color: #1a1a1a;
-            border-bottom-color: #1a1a1a;
+            color: var(--accent-text);
+            border-bottom-color: var(--accent);
+            background: none;
         }
 
         .interact-panel {
@@ -455,10 +542,9 @@
         }
 
         .interact-panel p.hint {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
-            color: #595959;
-            margin-bottom: 8px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
         }
 
         .query-row {
@@ -468,32 +554,41 @@
 
         .query-row input {
             flex: 1;
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 14px;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            font-size: 15px;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .query-row input:focus {
-            border-color: #888;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(80, 70, 229, 0.1);
+        }
+
+        .query-row input::placeholder {
+            color: #9ca3af;
         }
 
         .query-row button {
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 13px;
-            padding: 8px 16px;
-            background: #1a1a1a;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 20px;
+            background: var(--accent);
             color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.15s, transform 0.1s;
         }
 
         .query-row button:hover {
-            background: #333;
+            background: #4338ca;
+        }
+
+        .query-row button:active {
+            transform: scale(0.97);
         }
 
         .results-area {
@@ -501,28 +596,29 @@
         }
 
         .product-card {
-            font-family: system-ui, -apple-system, sans-serif;
             display: flex;
-            gap: 12px;
-            padding: 12px;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            margin-bottom: 8px;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
         }
 
         .product-card:hover {
-            border-color: #bbb;
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(80, 70, 229, 0.08);
+            transform: translateY(-1px);
         }
 
         .product-card img {
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             object-fit: cover;
-            border-radius: 4px;
-            background: #f0f0f0;
+            border-radius: 8px;
+            background: var(--surface);
         }
 
         .product-card .product-info {
@@ -531,20 +627,20 @@
         }
 
         .product-card .name {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 14px;
-            color: #1a1a1a;
+            color: var(--text);
         }
 
         .product-card .price {
             font-size: 14px;
-            color: #333;
-            margin-top: 2px;
+            color: var(--text-secondary);
+            margin-top: 3px;
         }
 
         .product-card .variants {
             font-size: 13px;
-            color: #595959;
+            color: var(--text-tertiary);
             margin-top: 2px;
         }
 
@@ -552,28 +648,25 @@
             display: inline-block;
             font-size: 13px;
             font-weight: 500;
-            color: #1a1a1a;
+            color: var(--accent-text);
             margin-top: 6px;
-            text-decoration: underline;
-            text-underline-offset: 2px;
         }
 
         .policy-answer {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
-            line-height: 1.6;
-            color: #333;
-            padding: 12px;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            margin-top: 8px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
         .policy-qa {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-light);
         }
 
         .policy-qa:last-child {
@@ -583,41 +676,44 @@
         }
 
         .policy-qa .pq {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--text);
             margin-bottom: 4px;
         }
 
         .policy-qa .pa {
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
-            color: #333;
-            line-height: 1.5;
+            color: var(--text-secondary);
+            line-height: 1.6;
         }
 
         .product-detail {
-            font-family: system-ui, -apple-system, sans-serif;
             padding: 20px;
-            background: #fff;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
+            background: var(--bg);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
             margin-bottom: 12px;
+            animation: detailIn 0.3s ease-out;
+        }
+
+        @keyframes detailIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .product-detail-header {
             display: flex;
             gap: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .product-detail-header img {
             width: 120px;
             height: 120px;
             object-fit: cover;
-            border-radius: 6px;
-            background: #f0f0f0;
+            border-radius: 10px;
+            background: var(--surface);
             flex-shrink: 0;
         }
 
@@ -628,52 +724,56 @@
 
         .product-detail h3 {
             font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
         }
 
         .product-detail .detail-row {
             font-size: 14px;
-            color: #333;
+            color: var(--text-secondary);
             margin-bottom: 6px;
             line-height: 1.5;
         }
 
         .product-detail .detail-label {
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--text);
         }
 
         .product-detail .detail-desc {
             font-size: 14px;
-            color: #444;
-            line-height: 1.6;
-            margin-bottom: 12px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 14px;
         }
 
         .product-detail .pdp-link {
             display: inline-block;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             color: #fff;
-            background: #1a1a1a;
-            padding: 8px 16px;
-            border-radius: 5px;
+            background: var(--accent);
+            padding: 10px 20px;
+            border-radius: 8px;
             text-decoration: none;
             margin-top: 8px;
-            transition: background 0.2s;
+            transition: background 0.15s, transform 0.1s;
         }
 
         .product-detail .pdp-link:hover {
-            background: #333;
+            background: #4338ca;
+        }
+
+        .product-detail .pdp-link:active {
+            transform: scale(0.97);
         }
 
         .detail-loading {
             text-align: center;
-            padding: 20px;
+            padding: 24px;
             font-size: 14px;
-            color: #595959;
+            color: var(--text-tertiary);
         }
 
         .loading-dot {
@@ -776,12 +876,19 @@
         log.appendChild(el);
     }
 
+    function iconClass(icon) {
+        if (icon === '✓') return 'step-icon-pass';
+        if (icon === '✗') return 'step-icon-fail';
+        if (icon === '–') return 'step-icon-neutral';
+        return 'step-icon-loading';
+    }
+
     function addStep(icon, text, detail, raw) {
         const step = document.createElement('div');
         step.className = 'step';
 
         let html = `<div class="step-header">
-            <span class="step-icon">${icon}</span>
+            <span class="step-icon ${iconClass(icon)}">${icon}</span>
             <span class="step-text">${text}</span>
         </div>`;
 
@@ -804,7 +911,7 @@
 
     function updateStep(step, icon, text, detail, raw) {
         let html = `<div class="step-header">
-            <span class="step-icon">${icon}</span>
+            <span class="step-icon ${iconClass(icon)}">${icon}</span>
             <span class="step-text">${text}</span>
         </div>`;
 
