@@ -189,18 +189,124 @@
             border-top: 1px solid #e5e5e5;
         }
 
-        .search-section p {
-            font-size: 14px;
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+            margin-left: 30px;
+        }
+
+        .tool-card {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            cursor: default;
+        }
+
+        .tool-card.interactive {
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .tool-card.interactive:hover {
+            border-color: #bbb;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .tool-card .tool-name {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 13px;
+        }
+
+        .tool-card .tool-desc {
+            color: #777;
+            font-size: 12px;
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
+        .tool-card .tool-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 6px;
+        }
+
+        .tool-badge.try-it {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .tool-badge.info {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .interact-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .interact-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .interact-tab {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .interact-tab:hover {
             color: #555;
+        }
+
+        .interact-tab.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }
+
+        .interact-panel {
+            display: none;
+        }
+
+        .interact-panel.active {
+            display: block;
+        }
+
+        .interact-panel p.hint {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            color: #888;
             margin-bottom: 8px;
         }
 
-        .search-row {
+        .query-row {
             display: flex;
             gap: 8px;
         }
 
-        .search-row input {
+        .query-row input {
             flex: 1;
             font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
@@ -210,11 +316,11 @@
             outline: none;
         }
 
-        .search-row input:focus {
+        .query-row input:focus {
             border-color: #888;
         }
 
-        .search-row button {
+        .query-row button {
             font-family: system-ui, -apple-system, sans-serif;
             font-size: 13px;
             padding: 8px 16px;
@@ -223,34 +329,117 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .product-results {
+        .query-row button:hover {
+            background: #333;
+        }
+
+        .results-area {
             margin-top: 12px;
         }
 
         .product-card {
             font-family: system-ui, -apple-system, sans-serif;
-            font-size: 13px;
-            padding: 10px;
+            display: flex;
+            gap: 12px;
+            padding: 12px;
             background: #fff;
             border: 1px solid #e5e5e5;
-            border-radius: 5px;
-            margin-bottom: 6px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .product-card:hover {
+            border-color: #bbb;
+        }
+
+        .product-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #f0f0f0;
+        }
+
+        .product-card .product-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .product-card .name {
             font-weight: 500;
+            font-size: 14px;
             color: #1a1a1a;
         }
 
         .product-card .price {
+            font-size: 13px;
             color: #555;
+            margin-top: 2px;
         }
 
-        .product-card .availability {
-            color: #888;
+        .product-card .variants {
             font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .product-card .click-hint {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 4px;
+        }
+
+        .policy-answer {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        .product-detail {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 16px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        .product-detail h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-detail .detail-row {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .product-detail .detail-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .loading-dot {
+            display: inline-block;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
@@ -605,15 +794,17 @@
                 mcpEndpoint = endpoint;
                 updateStep(step, '✓',
                     `Connected! This store's MCP server offers <strong>${tools.length}</strong> tools:`,
-                    tools.map(t => t.name + (t.description ? ` — ${t.description}` : '')).join('<br>'),
+                    null,
                     data
                 );
 
-                // Show search interface if catalog tool available
-                if (tools.some(t => t.name === 'search_catalog')) {
-                    await delay(300);
-                    showSearchInterface();
-                }
+                // Render tool cards
+                renderToolCards(step, tools);
+
+                // Show interactive section
+                await delay(300);
+                showInteractiveSection(tools);
+
                 connected = true;
                 break;
             } else {
@@ -633,69 +824,153 @@
         }
     }
 
-    // Search interface
-    function showSearchInterface() {
+    // Tool cards
+    const TOOL_META = {
+        search_catalog: { label: 'Search Catalog', short: 'Search products by keyword', interactive: true },
+        get_product_details: { label: 'Product Details', short: 'Look up a product by ID', interactive: true },
+        search_shop_policies_and_faqs: { label: 'Policies & FAQs', short: 'Ask about store policies', interactive: true },
+        get_cart: { label: 'Get Cart', short: 'Retrieve cart contents', interactive: false },
+        update_cart: { label: 'Update Cart', short: 'Add/remove cart items', interactive: false }
+    };
+
+    function renderToolCards(step, tools) {
+        const grid = document.createElement('div');
+        grid.className = 'tool-grid';
+        tools.forEach(t => {
+            const meta = TOOL_META[t.name] || { label: t.name, short: '', interactive: false };
+            const card = document.createElement('div');
+            card.className = 'tool-card' + (meta.interactive ? ' interactive' : '');
+            card.innerHTML = `
+                <div class="tool-name">${escapeHtml(meta.label)}</div>
+                <div class="tool-desc">${escapeHtml(meta.short)}</div>
+                <span class="tool-badge ${meta.interactive ? 'try-it' : 'info'}">${meta.interactive ? 'Try it' : 'Available'}</span>
+            `;
+            if (meta.interactive) {
+                card.addEventListener('click', () => {
+                    const tabId = t.name === 'search_catalog' ? 'catalog' :
+                                  t.name === 'search_shop_policies_and_faqs' ? 'policies' : 'catalog';
+                    switchTab(tabId);
+                    document.querySelector('.interact-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+            grid.appendChild(card);
+        });
+        step.appendChild(grid);
+    }
+
+    function showInteractiveSection(tools) {
+        const hasSearch = tools.some(t => t.name === 'search_catalog');
+        const hasPolicies = tools.some(t => t.name === 'search_shop_policies_and_faqs');
+
+        if (!hasSearch && !hasPolicies) return;
+
         const section = document.createElement('div');
-        section.className = 'search-section';
-        section.innerHTML = `
-            <p>Want to see what's in their catalog? Search below.</p>
-            <div class="search-row">
-                <input type="text" id="search-input" placeholder="e.g. running shoes, candles, t-shirts...">
-                <button onclick="searchCatalog()">Search</button>
-            </div>
-            <div class="product-results" id="product-results"></div>
-        `;
+        section.className = 'interact-section';
+
+        let tabsHtml = '<div class="interact-tabs">';
+        if (hasSearch) tabsHtml += '<button class="interact-tab active" onclick="switchTab(\'catalog\')">Search Catalog</button>';
+        if (hasPolicies) tabsHtml += `<button class="interact-tab${hasSearch ? '' : ' active'}" onclick="switchTab('policies')">Policies & FAQs</button>`;
+        tabsHtml += '</div>';
+
+        let panelsHtml = '';
+        if (hasSearch) {
+            panelsHtml += `
+                <div class="interact-panel active" id="panel-catalog">
+                    <p class="hint">Search this store's product catalog. Click any product to see full details.</p>
+                    <div class="query-row">
+                        <input type="text" id="search-input" placeholder="e.g. hot sauce, gift sets, seasonings...">
+                        <button onclick="searchCatalog()">Search</button>
+                    </div>
+                    <div class="results-area" id="catalog-results"></div>
+                </div>
+            `;
+        }
+        if (hasPolicies) {
+            panelsHtml += `
+                <div class="interact-panel${hasSearch ? '' : ' active'}" id="panel-policies">
+                    <p class="hint">Ask a question about this store's policies, shipping, returns, or services.</p>
+                    <div class="query-row">
+                        <input type="text" id="policy-input" placeholder="e.g. What is your return policy?">
+                        <button onclick="searchPolicies()">Ask</button>
+                    </div>
+                    <div class="results-area" id="policy-results"></div>
+                </div>
+            `;
+        }
+
+        section.innerHTML = tabsHtml + panelsHtml;
         log.appendChild(section);
 
-        document.getElementById('search-input').addEventListener('keydown', (e) => {
+        document.getElementById('search-input')?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') searchCatalog();
+        });
+        document.getElementById('policy-input')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchPolicies();
         });
     }
 
+    function switchTab(tabId) {
+        document.querySelectorAll('.interact-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.interact-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(`panel-${tabId}`);
+        if (panel) {
+            panel.classList.add('active');
+            const tabs = document.querySelectorAll('.interact-tab');
+            tabs.forEach(t => {
+                if ((tabId === 'catalog' && t.textContent === 'Search Catalog') ||
+                    (tabId === 'policies' && t.textContent === 'Policies & FAQs')) {
+                    t.classList.add('active');
+                }
+            });
+        }
+    }
+
+    // MCP tool call helper
+    let callId = 10;
+    function mcpCall(toolName, args) {
+        return proxyFetch(mcpEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'tools/call',
+                id: callId++,
+                params: {
+                    name: toolName,
+                    arguments: {
+                        meta: { 'ucp-agent': { profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json' } },
+                        ...args
+                    }
+                }
+            })
+        });
+    }
+
+    // Catalog search
     async function searchCatalog() {
         const query = document.getElementById('search-input').value.trim();
         if (!query) return;
 
-        const results = document.getElementById('product-results');
-        results.innerHTML = '<div class="step"><div class="step-header"><span class="step-icon">⏳</span><span class="step-text">Searching...</span></div></div>';
+        const results = document.getElementById('catalog-results');
+        results.innerHTML = '<span class="loading-dot">Searching...</span>';
 
         try {
-            const resp = await proxyFetch(mcpEndpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    method: 'tools/call',
-                    id: 2,
-                    params: {
-                        name: 'search_catalog',
-                        arguments: {
-                            meta: {
-                                'ucp-agent': {
-                                    profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json'
-                                }
-                            },
-                            catalog: {
-                                query: query,
-                                pagination: { limit: 5 }
-                            }
-                        }
-                    }
-                })
-            });
-
+            const resp = await mcpCall('search_catalog', { catalog: { query, pagination: { limit: 10 } } });
             const data = await resp.json();
             const products = extractProducts(data);
 
             if (products.length > 0) {
                 results.innerHTML = products.map(p => `
-                    <div class="product-card">
-                        <div class="name">${escapeHtml(p.name)}</div>
-                        ${p.price ? `<div class="price">${escapeHtml(p.price)}</div>` : ''}
-                        ${p.availability ? `<div class="availability">${escapeHtml(p.availability)}</div>` : ''}
+                    <div class="product-card" onclick="getProductDetails('${escapeHtml(p.id || '')}')">
+                        ${p.image ? `<img src="${escapeHtml(p.image)}" alt="">` : ''}
+                        <div class="product-info">
+                            <div class="name">${escapeHtml(p.name)}</div>
+                            ${p.price ? `<div class="price">${escapeHtml(p.price)}</div>` : ''}
+                            ${p.variantCount ? `<div class="variants">${p.variantCount} variants</div>` : ''}
+                            ${p.id ? '<div class="click-hint">Click for details →</div>' : ''}
+                        </div>
                     </div>
                 `).join('');
-
                 results.innerHTML += `<details class="step-raw"><summary>Show raw response</summary><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></details>`;
             } else {
                 results.innerHTML = `<div class="step-detail">No products found for "${escapeHtml(query)}".</div>
@@ -703,6 +978,63 @@
             }
         } catch (e) {
             results.innerHTML = `<div class="step-detail">Search failed: ${escapeHtml(e.message)}</div>`;
+        }
+    }
+
+    // Product details
+    async function getProductDetails(productId) {
+        if (!productId) return;
+
+        const results = document.getElementById('catalog-results');
+        const existing = document.getElementById('product-detail-view');
+        if (existing) existing.remove();
+
+        const detail = document.createElement('div');
+        detail.id = 'product-detail-view';
+        detail.className = 'product-detail';
+        detail.innerHTML = '<span class="loading-dot">Loading product details...</span>';
+        results.insertBefore(detail, results.firstChild);
+
+        try {
+            const resp = await mcpCall('get_product_details', { product_id: productId });
+            const data = await resp.json();
+            const product = extractProductDetail(data);
+
+            let html = `<h3>${escapeHtml(product.name)}</h3>`;
+            if (product.description) html += `<div class="detail-row">${escapeHtml(product.description)}</div>`;
+            if (product.price) html += `<div class="detail-row"><span class="detail-label">Price:</span> ${escapeHtml(product.price)}</div>`;
+            if (product.availability) html += `<div class="detail-row"><span class="detail-label">Availability:</span> ${escapeHtml(product.availability)}</div>`;
+            if (product.options && product.options.length > 0) {
+                html += `<div class="detail-row"><span class="detail-label">Options:</span> ${product.options.map(o => escapeHtml(o)).join(', ')}</div>`;
+            }
+            if (product.variants && product.variants.length > 0) {
+                html += `<div class="detail-row"><span class="detail-label">Variants:</span> ${product.variants.length} available</div>`;
+            }
+            html += `<details class="step-raw"><summary>Show raw response</summary><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></details>`;
+
+            detail.innerHTML = html;
+        } catch (e) {
+            detail.innerHTML = `<div class="step-detail">Failed to load details: ${escapeHtml(e.message)}</div>`;
+        }
+    }
+
+    // Policies search
+    async function searchPolicies() {
+        const query = document.getElementById('policy-input').value.trim();
+        if (!query) return;
+
+        const results = document.getElementById('policy-results');
+        results.innerHTML = '<span class="loading-dot">Looking up policy...</span>';
+
+        try {
+            const resp = await mcpCall('search_shop_policies_and_faqs', { query });
+            const data = await resp.json();
+            const answer = extractPolicyAnswer(data);
+
+            results.innerHTML = `<div class="policy-answer">${escapeHtml(answer)}</div>
+                <details class="step-raw"><summary>Show raw response</summary><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></details>`;
+        } catch (e) {
+            results.innerHTML = `<div class="step-detail">Policy lookup failed: ${escapeHtml(e.message)}</div>`;
         }
     }
 
@@ -785,7 +1117,6 @@
         if (data.result && data.result.structuredContent && data.result.structuredContent.products) {
             source = data.result.structuredContent.products;
         } else if (data.result && data.result.content) {
-            // Try parsing content blocks
             for (const block of (Array.isArray(data.result.content) ? data.result.content : [])) {
                 if (block.type === 'text') {
                     try {
@@ -798,15 +1129,59 @@
 
         if (source && Array.isArray(source)) {
             for (const p of source.slice(0, 10)) {
+                const img = p.image || p.featuredImage || (p.images && p.images[0]) || '';
+                const imgUrl = typeof img === 'string' ? img : (img.url || img.src || '');
                 products.push({
+                    id: p.id || p.productId || '',
                     name: p.name || p.title || 'Unnamed product',
-                    price: p.price || (p.offers && p.offers.price) || '',
+                    price: p.price || (p.offers && p.offers.price) || (p.priceRange && p.priceRange.minVariantPrice && p.priceRange.minVariantPrice.amount) || '',
+                    image: imgUrl,
+                    variantCount: p.variantCount || (p.variants && p.variants.length) || 0,
                     availability: p.availability || (p.offers && p.offers.availability) || ''
                 });
             }
         }
 
         return products;
+    }
+
+    function extractProductDetail(data) {
+        let p = null;
+        if (data.result && data.result.structuredContent && data.result.structuredContent.product) {
+            p = data.result.structuredContent.product;
+        } else if (data.result && data.result.content) {
+            for (const block of (Array.isArray(data.result.content) ? data.result.content : [])) {
+                if (block.type === 'text') {
+                    try {
+                        const parsed = JSON.parse(block.text);
+                        if (parsed.product) p = parsed.product;
+                        else if (parsed.name || parsed.title) p = parsed;
+                    } catch (e) {}
+                }
+            }
+        }
+        if (!p) p = {};
+        return {
+            name: p.name || p.title || 'Unknown product',
+            description: p.description || p.descriptionHtml || '',
+            price: p.price || (p.offers && p.offers.price) || (p.priceRange && p.priceRange.minVariantPrice && `${p.priceRange.minVariantPrice.amount} ${p.priceRange.minVariantPrice.currencyCode}`) || '',
+            availability: p.availability || (p.offers && p.offers.availability) || '',
+            options: p.options ? p.options.map(o => `${o.name}: ${(o.values || []).join(', ')}`) : [],
+            variants: p.variants || []
+        };
+    }
+
+    function extractPolicyAnswer(data) {
+        if (data.result && data.result.content) {
+            for (const block of (Array.isArray(data.result.content) ? data.result.content : [])) {
+                if (block.type === 'text') return block.text;
+            }
+        }
+        if (data.result && data.result.structuredContent && data.result.structuredContent.answer) {
+            return data.result.structuredContent.answer;
+        }
+        if (data.result && typeof data.result === 'string') return data.result;
+        return 'No answer returned.';
     }
     </script>
 </body>
