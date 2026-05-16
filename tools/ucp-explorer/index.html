@@ -661,104 +661,117 @@
         addPhaseLabel('Agent Readiness');
 
         // Check reachability
-        let step = addStep('⏳', `Checking if <strong>${domain}</strong> is reachable...`);
+        const reachUrl = `https://${domain}/robots.txt`;
+        let step = addStep('⏳', `Checking if <strong>${domain}</strong> is reachable...`, `GET ${reachUrl}`);
         try {
-            const resp = await proxyFetch(`https://${domain}/robots.txt`);
+            const resp = await proxyFetch(reachUrl);
             if (resp.ok || resp.status === 404) {
-                updateStep(step, '✓', `<strong>${domain}</strong> is reachable.`);
+                updateStep(step, '✓', `<strong>${domain}</strong> is reachable.`, `GET ${reachUrl} → HTTP ${resp.status}`);
             } else {
-                updateStep(step, '✗', `<strong>${domain}</strong> returned status ${resp.status}. May not be accessible.`);
+                updateStep(step, '✗', `<strong>${domain}</strong> returned HTTP ${resp.status}. May not be accessible.`, `GET ${reachUrl} → HTTP ${resp.status}`);
                 return;
             }
         } catch (e) {
-            updateStep(step, '✗', `Could not reach <strong>${domain}</strong>. Check the domain and try again.`);
+            updateStep(step, '✗', `Could not reach <strong>${domain}</strong>. Check the domain and try again.`, `GET ${reachUrl} → Connection failed`);
             return;
         }
 
         await delay(400);
 
         // robots.txt
-        step = addStep('⏳', 'Fetching robots.txt to see which AI agents are welcome...');
+        const robotsUrl = `https://${domain}/robots.txt`;
+        step = addStep('⏳', `Fetching <code>/robots.txt</code> to see which AI agents are welcome...`, `GET ${robotsUrl}`);
         try {
-            const resp = await proxyFetch(`https://${domain}/robots.txt`);
+            const resp = await proxyFetch(robotsUrl);
             if (resp.ok) {
                 const text = await resp.text();
                 const analysis = analyzeRobotsTxt(text);
                 updateStep(step, '✓',
-                    `Found robots.txt — <strong>${analysis.allowed}/${AI_AGENTS.length}</strong> known AI agents are allowed.`,
-                    analysis.blocked.length > 0 ? `Blocked: ${analysis.blocked.join(', ')}` : 'All checked agents are allowed.',
+                    `Found <code>/robots.txt</code> — <strong>${analysis.allowed}/${AI_AGENTS.length}</strong> known AI agents are allowed.`,
+                    `GET ${robotsUrl} → HTTP ${resp.status}` + (analysis.blocked.length > 0 ? ` | Blocked: ${analysis.blocked.join(', ')}` : ' | All checked agents are allowed.'),
                     text
                 );
             } else {
-                updateStep(step, '–', 'No robots.txt found — all agents are implicitly allowed.');
+                updateStep(step, '–', `No <code>/robots.txt</code> found — all agents are implicitly allowed.`, `GET ${robotsUrl} → HTTP ${resp.status}`);
             }
         } catch (e) {
-            updateStep(step, '–', 'Could not fetch robots.txt.');
+            updateStep(step, '–', `Could not fetch <code>/robots.txt</code>.`, `GET ${robotsUrl} → Connection failed`);
         }
 
         await delay(400);
 
         // llms.txt
-        step = addStep('⏳', 'Looking for an llms.txt file...');
+        const llmsUrl = `https://${domain}/llms.txt`;
+        step = addStep('⏳', `Looking for <code>/llms.txt</code>...`, `GET ${llmsUrl}`);
         try {
-            const resp = await proxyFetch(`https://${domain}/llms.txt`);
+            const resp = await proxyFetch(llmsUrl);
             if (resp.ok) {
                 const text = await resp.text();
-                updateStep(step, '✓', 'Found it! This site provides context for LLMs.',
-                    `${text.split('\n').length} lines`,
+                updateStep(step, '✓', `Found <code>/llms.txt</code> — this site provides context for LLMs.`,
+                    `GET ${llmsUrl} → HTTP ${resp.status} | ${text.split('\n').length} lines`,
                     text
                 );
             } else {
-                updateStep(step, '–', 'No llms.txt present.');
+                updateStep(step, '–', `No <code>/llms.txt</code> present.`, `GET ${llmsUrl} → HTTP ${resp.status}`);
             }
         } catch (e) {
-            updateStep(step, '–', 'No llms.txt present.');
+            updateStep(step, '–', `Could not fetch <code>/llms.txt</code>.`, `GET ${llmsUrl} → Connection failed`);
         }
 
         await delay(400);
 
         // agents.md
-        step = addStep('⏳', 'Checking for an agents.md manifest...');
+        const agentsUrl = `https://${domain}/agents.md`;
+        step = addStep('⏳', `Checking for <code>/agents.md</code> manifest...`, `GET ${agentsUrl}`);
         try {
-            const resp = await proxyFetch(`https://${domain}/agents.md`);
+            const resp = await proxyFetch(agentsUrl);
             if (resp.ok) {
                 const text = await resp.text();
-                updateStep(step, '✓', 'Found an agents.md file.',
-                    `${text.split('\n').length} lines`,
+                updateStep(step, '✓', `Found <code>/agents.md</code>.`,
+                    `GET ${agentsUrl} → HTTP ${resp.status} | ${text.split('\n').length} lines`,
                     text
                 );
             } else {
-                updateStep(step, '–', 'No agents.md present.');
+                updateStep(step, '–', `No <code>/agents.md</code> present.`, `GET ${agentsUrl} → HTTP ${resp.status}`);
             }
         } catch (e) {
-            updateStep(step, '–', 'No agents.md present.');
+            updateStep(step, '–', `Could not fetch <code>/agents.md</code>.`, `GET ${agentsUrl} → Connection failed`);
         }
 
         await delay(400);
 
         // skills endpoints
-        step = addStep('⏳', 'Looking for skill discovery endpoints...');
+        const skillsUrl = `https://${domain}/skills/`;
+        const agentSkillsUrl = `https://${domain}/agent-skills/`;
+        step = addStep('⏳', `Looking for skill discovery endpoints...`, `GET ${skillsUrl} and ${agentSkillsUrl}`);
         let foundSkills = false;
+        let skillsDetail = '';
         try {
-            const resp1 = await proxyFetch(`https://${domain}/skills/`);
+            const resp1 = await proxyFetch(skillsUrl);
+            skillsDetail += `GET ${skillsUrl} → HTTP ${resp1.status}`;
             if (resp1.ok) {
                 const text = await resp1.text();
-                updateStep(step, '✓', 'Found a /skills/ endpoint.', null, text);
+                updateStep(step, '✓', `Found <code>/skills/</code> endpoint.`, skillsDetail, text);
                 foundSkills = true;
             }
-        } catch (e) {}
-        if (!foundSkills) {
-            try {
-                const resp2 = await proxyFetch(`https://${domain}/agent-skills/`);
-                if (resp2.ok) {
-                    const text = await resp2.text();
-                    updateStep(step, '✓', 'Found an /agent-skills/ endpoint.', null, text);
-                    foundSkills = true;
-                }
-            } catch (e) {}
+        } catch (e) {
+            skillsDetail += `GET ${skillsUrl} → Connection failed`;
         }
         if (!foundSkills) {
-            updateStep(step, '–', 'No skill discovery endpoints found.');
+            try {
+                const resp2 = await proxyFetch(agentSkillsUrl);
+                skillsDetail += ` | GET ${agentSkillsUrl} → HTTP ${resp2.status}`;
+                if (resp2.ok) {
+                    const text = await resp2.text();
+                    updateStep(step, '✓', `Found <code>/agent-skills/</code> endpoint.`, skillsDetail, text);
+                    foundSkills = true;
+                }
+            } catch (e) {
+                skillsDetail += ` | GET ${agentSkillsUrl} → Connection failed`;
+            }
+        }
+        if (!foundSkills) {
+            updateStep(step, '–', `No skill discovery endpoints found.`, skillsDetail);
         }
     }
 
@@ -766,16 +779,17 @@
     async function phase2(domain) {
         addPhaseLabel('UCP Discovery');
 
-        const step = addStep('⏳', `Checking for a UCP profile at <code>/.well-known/ucp</code>...`);
+        const ucpUrl = `https://${domain}/.well-known/ucp`;
+        const step = addStep('⏳', `Checking for a UCP profile at <code>/.well-known/ucp</code>...`, `GET ${ucpUrl}`);
         try {
-            const resp = await proxyFetch(`https://${domain}/.well-known/ucp`);
+            const resp = await proxyFetch(ucpUrl);
             if (resp.ok) {
                 const text = await resp.text();
                 let data;
                 try {
                     data = JSON.parse(text);
                 } catch (e) {
-                    updateStep(step, '✗', 'Found a file at /.well-known/ucp but it is not valid JSON.', null, text);
+                    updateStep(step, '✗', `Found a file at <code>/.well-known/ucp</code> but it is not valid JSON.`, `GET ${ucpUrl} → HTTP ${resp.status} | Response is not valid JSON`, text);
                     return;
                 }
 
@@ -783,40 +797,41 @@
                 const capabilities = extractCapabilities(data);
                 const mcpUrl = extractMcpEndpoint(data, domain);
 
-                let detail = '';
+                let detail = `GET ${ucpUrl} → HTTP ${resp.status}`;
                 if (capabilities.length > 0) {
-                    detail = `Capabilities: ${capabilities.join(', ')}`;
+                    detail += ` | Capabilities: ${capabilities.join(', ')}`;
                 }
                 if (mcpUrl) {
-                    detail += (detail ? ' | ' : '') + `MCP endpoint: ${mcpUrl}`;
+                    detail += ` | MCP endpoint: ${mcpUrl}`;
                     mcpEndpoint = mcpUrl;
                 }
 
                 updateStep(step, '✓',
                     'Found it! This store publishes a UCP manifest.',
-                    detail || 'Manifest retrieved.',
+                    detail,
                     data
                 );
             } else {
-                updateStep(step, '✗', 'No UCP manifest found at this domain. This store may not have UCP enabled yet.');
+                updateStep(step, '✗', `No UCP manifest found at this domain. This store may not have UCP enabled yet.`, `GET ${ucpUrl} → HTTP ${resp.status}`);
 
                 // Try the Shopify convention
                 await delay(300);
-                const step2 = addStep('⏳', `Trying Shopify MCP endpoint convention: <code>/api/ucp/mcp</code>...`);
+                const fallbackUrl = `https://${domain}/api/ucp/mcp`;
+                const step2 = addStep('⏳', `Trying Shopify MCP endpoint convention: <code>/api/ucp/mcp</code>...`, `POST ${fallbackUrl}`);
                 try {
-                    const mcpResp = await proxyFetch(`https://${domain}/api/ucp/mcp`, {
+                    const mcpResp = await proxyFetch(fallbackUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ jsonrpc: '2.0', method: 'tools/list', id: 1, params: { _meta: { 'ucp-agent': { profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json' } } } })
                     });
                     if (mcpResp.ok) {
-                        mcpEndpoint = `https://${domain}/api/ucp/mcp`;
-                        updateStep(step2, '✓', `MCP endpoint found at <code>/api/ucp/mcp</code> (no UCP manifest, but endpoint responds).`);
+                        mcpEndpoint = fallbackUrl;
+                        updateStep(step2, '✓', `MCP endpoint found at <code>/api/ucp/mcp</code> (no UCP manifest, but endpoint responds).`, `POST ${fallbackUrl} → HTTP ${mcpResp.status}`);
                     } else {
-                        updateStep(step2, '✗', 'No MCP endpoint responding at the standard Shopify path either.');
+                        updateStep(step2, '✗', `No MCP endpoint responding at the standard Shopify path either.`, `POST ${fallbackUrl} → HTTP ${mcpResp.status}`);
                     }
                 } catch (e) {
-                    updateStep(step2, '✗', 'Could not connect to MCP endpoint.');
+                    updateStep(step2, '✗', `Could not connect to MCP endpoint.`, `POST ${fallbackUrl} → Connection failed`);
                 }
             }
         } catch (e) {
@@ -841,7 +856,7 @@
 
         let connected = false;
         for (const endpoint of endpoints) {
-            const step = addStep('⏳', `Connecting to MCP endpoint at <code>${endpoint}</code>...`);
+            const step = addStep('⏳', `Connecting to MCP endpoint at <code>${endpoint}</code>...`, `POST ${endpoint} | Method: tools/list`);
 
             try {
                 // Try with agent profile meta (required for UCP endpoints)
@@ -863,7 +878,7 @@
                 });
 
             if (!resp.ok) {
-                updateStep(step, '–', `Returned status ${resp.status}. Trying next endpoint...`);
+                updateStep(step, '–', `Endpoint returned HTTP ${resp.status}. Trying next endpoint...`, `POST ${endpoint} → HTTP ${resp.status}`);
                 await delay(300);
                 continue;
             }
@@ -873,7 +888,7 @@
             try {
                 data = JSON.parse(text);
             } catch (e) {
-                updateStep(step, '–', 'Responded but not with valid JSON. Trying next...', null, text);
+                updateStep(step, '–', `Endpoint responded (HTTP ${resp.status}) but not with valid JSON. Trying next...`, `POST ${endpoint} → HTTP ${resp.status} | Invalid JSON`, text);
                 await delay(300);
                 continue;
             }
@@ -883,7 +898,7 @@
                 mcpEndpoint = endpoint;
                 updateStep(step, '✓',
                     `Connected! This store's MCP server offers <strong>${tools.length}</strong> tools:`,
-                    null,
+                    `POST ${endpoint} → HTTP 200 | ${tools.length} tools discovered`,
                     data
                 );
 
@@ -897,12 +912,12 @@
                 connected = true;
                 break;
             } else {
-                updateStep(step, '–', 'Connected but no tools were listed.', null, data);
+                updateStep(step, '–', `Connected (HTTP 200) but no tools were listed in the response.`, `POST ${endpoint} → HTTP 200 | 0 tools returned`, data);
                 await delay(300);
                 continue;
             }
         } catch (e) {
-            updateStep(step, '–', `Could not connect: ${e.message}. Trying next...`);
+            updateStep(step, '–', `Could not connect to <code>${endpoint}</code>.`, `POST ${endpoint} → Connection failed: ${e.message}`);
             await delay(300);
             continue;
         }
