@@ -5,72 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kyle Risley</title>
     <style>
+        :root {
+            --accent: #5046e5;
+            --accent-light: #ededfd;
+            --accent-text: #3f37c9;
+            --text: #1a1a1a;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --border: #e5e7eb;
+        }
+        * { box-sizing: border-box; }
         body {
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             font-size: 16px;
-            line-height: 1.6;
+            line-height: 1.7;
             max-width: 600px;
-            margin: 80px auto;
-            padding: 0 20px;
-            color: #1a1a1a;
+            margin: 0 auto;
+            padding: 48px 24px 60px;
+            color: var(--text);
         }
         h1 {
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
             margin-bottom: 0;
         }
         p.tagline {
             margin-top: 6px;
-            color: #666;
-            font-size: 15px;
+            color: var(--text-tertiary);
+            font-size: 16px;
         }
         a {
-            color: inherit;
-            text-decoration-color: #ccc;
+            color: var(--accent-text);
+            text-decoration-color: #c7c5f2;
             text-underline-offset: 3px;
-            transition: text-decoration-color 0.2s;
+            transition: text-decoration-color 0.15s;
         }
         a:hover {
-            text-decoration-color: #1a1a1a;
+            text-decoration-color: var(--accent-text);
         }
         hr {
             border: none;
-            border-top: 1px solid #e5e5e5;
+            border-top: 1px solid var(--border);
             margin: 32px 0;
         }
         ul {
             padding-left: 20px;
         }
         li {
-            margin-bottom: 8px;
-            color: #333;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
         }
         li::marker {
-            color: #ccc;
+            color: var(--border);
+        }
+        .tools-section h2 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+        }
+        .tool-link {
+            display: block;
+            padding: 14px 16px;
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+        .tool-link:hover {
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(80, 70, 229, 0.08);
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .tool-link .tool-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+        }
+        .tool-link .tool-desc {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
         }
         .links a {
             display: inline-block;
-            font-family: system-ui, -apple-system, sans-serif;
             font-size: 14px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
             text-decoration: none;
-            color: #595959;
-            transition: color 0.2s;
+            color: var(--text-tertiary);
+            transition: color 0.15s;
         }
         .links a:hover {
-            color: #1a1a1a;
+            color: var(--accent-text);
         }
         .links span.sep {
-            color: #767676;
+            color: var(--border);
             margin: 0 10px;
         }
 
         /* the razzle dazzle */
         h1 span {
             display: inline-block;
-            background: linear-gradient(135deg, #1a1a1a 0%, #555 50%, #1a1a1a 100%);
+            background: linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, var(--text) 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
@@ -95,6 +137,16 @@
         <li>Writes about SEO on the <a href="https://www.shopify.com/blog/authors/kyle-risley">Shopify blog</a></li>
         <li>Stuff I've built: <a href="https://liftvault.com">Lift Vault</a>, <a href="https://labelrater.com">Label Rater</a>, <a href="https://openpermitdata.com">Open Permit Data</a></li>
     </ul>
+
+    <hr>
+
+    <div class="tools-section">
+        <h2>Tools</h2>
+        <a href="/tools/ucp-explorer/" class="tool-link">
+            <div class="tool-title">UCP Explorer</div>
+            <div class="tool-desc">See how AI agents discover and interact with a store's commerce endpoints.</div>
+        </a>
+    </div>
 
     <hr>
 

@@ -785,10 +785,23 @@
             0%, 100% { opacity: 0.3; }
             50% { opacity: 1; }
         }
+        .back-link {
+            display: inline-block;
+            font-size: 14px;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            margin-bottom: 24px;
+            transition: color 0.15s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-text);
+        }
     </style>
 </head>
 <body>
     <div class="page-header">
+        <a href="/" class="back-link">&larr; kylerisley.com</a>
         <h1>UCP Explorer</h1>
         <p class="subtitle">A transparency tool for the Universal Commerce Protocol</p>
 
