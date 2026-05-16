@@ -798,28 +798,38 @@
         await delay(400);
 
         // Agent Skills Discovery (experimental RFC: github.com/cloudflare/agent-skills-discovery-rfc)
-        const skillsIndexUrl = `https://${domain}/.well-known/agent-skills/index.json`;
-        step = addStep('⏳', `Checking for agent skills index (experimental)...`, `GET ${skillsIndexUrl}`);
-        try {
-            const resp = await proxyFetch(skillsIndexUrl);
-            const skillsDetail = `GET ${skillsIndexUrl} → HTTP ${resp.status}`;
-            if (resp.ok) {
-                const text = await resp.text();
-                let skillCount = '';
-                try {
-                    const parsed = JSON.parse(text);
-                    const skills = parsed.skills || parsed.entries || [];
-                    if (Array.isArray(skills)) skillCount = ` | ${skills.length} skill${skills.length !== 1 ? 's' : ''} listed`;
-                } catch (e) {}
-                updateStep(step, '✓', `Found <code>/.well-known/agent-skills/index.json</code>.`,
-                    skillsDetail + skillCount + ' | Per the <a href="https://github.com/cloudflare/agent-skills-discovery-rfc" target="_blank" rel="noopener">Agent Skills Discovery RFC</a> (experimental)',
-                    text
-                );
-            } else {
-                updateStep(step, '–', `No agent skills index found. This is expected — the <a href="https://github.com/cloudflare/agent-skills-discovery-rfc" target="_blank" rel="noopener">Agent Skills Discovery RFC</a> is still experimental and most sites don't implement it yet.`, skillsDetail);
+        const rfcLink = '<a href="https://github.com/cloudflare/agent-skills-discovery-rfc" target="_blank" rel="noopener">Agent Skills Discovery RFC</a>';
+        const skillsPaths = [
+            { url: `https://${domain}/.well-known/agent-skills/index.json`, label: '/.well-known/agent-skills/index.json', note: 'current' },
+            { url: `https://${domain}/.well-known/skills/index.json`, label: '/.well-known/skills/index.json', note: 'legacy' }
+        ];
+        step = addStep('⏳', `Checking for agent skills index (experimental)...`, `Checking ${skillsPaths.map(s => s.label).join(' and ')}`);
+        let foundSkills = false;
+        let skillsDetail = '';
+        for (const sp of skillsPaths) {
+            try {
+                const resp = await proxyFetch(sp.url);
+                skillsDetail += (skillsDetail ? ' | ' : '') + `GET ${sp.url} → HTTP ${resp.status}`;
+                if (resp.ok && !foundSkills) {
+                    const text = await resp.text();
+                    let skillCount = '';
+                    try {
+                        const parsed = JSON.parse(text);
+                        const skills = parsed.skills || parsed.entries || [];
+                        if (Array.isArray(skills)) skillCount = ` | ${skills.length} skill${skills.length !== 1 ? 's' : ''} listed`;
+                    } catch (e) {}
+                    updateStep(step, '✓', `Found <code>${sp.label}</code>${sp.note === 'legacy' ? ' (legacy path)' : ''}.`,
+                        skillsDetail + skillCount + ` | Per the ${rfcLink} (experimental)`,
+                        text
+                    );
+                    foundSkills = true;
+                }
+            } catch (e) {
+                skillsDetail += (skillsDetail ? ' | ' : '') + `GET ${sp.url} → Connection failed`;
             }
-        } catch (e) {
-            updateStep(step, '–', `No agent skills index found. This is expected — the <a href="https://github.com/cloudflare/agent-skills-discovery-rfc" target="_blank" rel="noopener">Agent Skills Discovery RFC</a> is still experimental and most sites don't implement it yet.`, `GET ${skillsIndexUrl} → Connection failed`);
+        }
+        if (!foundSkills) {
+            updateStep(step, '–', `No agent skills index found. This is expected — the ${rfcLink} is still experimental and most sites don't implement it yet.`, skillsDetail);
         }
     }
 

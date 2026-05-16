@@ -5,6 +5,7 @@
 const DEFAULT_ALLOWED_PATHS = [
   '/.well-known/ucp',
   '/.well-known/agent-skills/',
+  '/.well-known/skills/',
   '/api/ucp/mcp',
   '/api/mcp',
   '/robots.txt',
