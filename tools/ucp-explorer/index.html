@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCP Explorer — See How AI Agents Discover Your Store</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 720px;
+            margin: 60px auto;
+            padding: 0 20px;
+            color: #1a1a1a;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .input-row input {
+            flex: 1;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 15px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-row input:focus {
+            border-color: #888;
+        }
+
+        .input-row button {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .input-row button:hover {
+            background: #333;
+        }
+
+        .input-row button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .log {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            background: #fafafa;
+            padding: 20px;
+            min-height: 100px;
+            display: none;
+        }
+
+        .log.active {
+            display: block;
+        }
+
+        .step {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .step-icon {
+            font-size: 14px;
+            width: 20px;
+            flex-shrink: 0;
+            text-align: center;
+            padding-top: 2px;
+        }
+
+        .step-text {
+            font-size: 15px;
+            flex: 1;
+        }
+
+        .step-text strong {
+            font-weight: 600;
+        }
+
+        .step-detail {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+            margin-left: 30px;
+        }
+
+        .step-raw {
+            margin-top: 8px;
+            margin-left: 30px;
+        }
+
+        .step-raw summary {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .step-raw summary:hover {
+            color: #555;
+        }
+
+        .step-raw pre {
+            font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            background: #f0f0f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 6px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .phase-label {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #999;
+            margin-top: 16px;
+            margin-bottom: 4px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .phase-label:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .search-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .search-section p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-row input {
+            flex: 1;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .search-row input:focus {
+            border-color: #888;
+        }
+
+        .search-row button {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            padding: 8px 16px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .product-results {
+            margin-top: 12px;
+        }
+
+        .product-card {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 5px;
+            margin-bottom: 6px;
+        }
+
+        .product-card .name {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .product-card .price {
+            color: #555;
+        }
+
+        .product-card .availability {
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>UCP Explorer</h1>
+    <p class="subtitle">See how AI agents discover and interact with a store's commerce endpoints.</p>
+
+    <div class="input-row">
+        <input type="text" id="domain-input" placeholder="Enter a store domain (e.g. allbirds.com)" autocomplete="off">
+        <button id="go-btn" onclick="startExploration()">Explore</button>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <script>
+    // Configuration
+    const PROXY_BASE = 'https://ucp-proxy.kylerisley.com';
+    const AI_AGENTS = [
+        'Googlebot', 'Bingbot', 'ChatGPT-User', 'Claude-User',
+        'Perplexity-User', 'PerplexityBot', 'OAI-SearchBot',
+        'Claude-SearchBot', 'Google-Agent', 'Applebot'
+    ];
+
+    let currentDomain = '';
+    let mcpEndpoint = '';
+
+    // UI helpers
+    const log = document.getElementById('log');
+    const domainInput = document.getElementById('domain-input');
+    const goBtn = document.getElementById('go-btn');
+
+    domainInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') startExploration();
+    });
+
+    function addPhaseLabel(text) {
+        const el = document.createElement('div');
+        el.className = 'phase-label';
+        el.textContent = text;
+        log.appendChild(el);
+    }
+
+    function addStep(icon, text, detail, raw) {
+        const step = document.createElement('div');
+        step.className = 'step';
+
+        let html = `<div class="step-header">
+            <span class="step-icon">${icon}</span>
+            <span class="step-text">${text}</span>
+        </div>`;
+
+        if (detail) {
+            html += `<div class="step-detail">${detail}</div>`;
+        }
+
+        if (raw) {
+            html += `<details class="step-raw">
+                <summary>Show raw response</summary>
+                <pre>${escapeHtml(typeof raw === 'string' ? raw : JSON.stringify(raw, null, 2))}</pre>
+            </details>`;
+        }
+
+        step.innerHTML = html;
+        log.appendChild(step);
+        step.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return step;
+    }
+
+    function updateStep(step, icon, text, detail, raw) {
+        let html = `<div class="step-header">
+            <span class="step-icon">${icon}</span>
+            <span class="step-text">${text}</span>
+        </div>`;
+
+        if (detail) {
+            html += `<div class="step-detail">${detail}</div>`;
+        }
+
+        if (raw) {
+            html += `<details class="step-raw">
+                <summary>Show raw response</summary>
+                <pre>${escapeHtml(typeof raw === 'string' ? raw : JSON.stringify(raw, null, 2))}</pre>
+            </details>`;
+        }
+
+        step.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function delay(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+
+    // Proxy fetch
+    async function proxyFetch(url, options = {}) {
+        const proxyUrl = `${PROXY_BASE}?url=${encodeURIComponent(url)}`;
+        const resp = await fetch(proxyUrl, options);
+        return resp;
+    }
+
+    // Main exploration flow
+    async function startExploration() {
+        const domain = domainInput.value.trim().replace(/^https?:\/\//, '').replace(/\/+$/, '');
+        if (!domain) return;
+
+        currentDomain = domain;
+        mcpEndpoint = '';
+        log.innerHTML = '';
+        log.classList.add('active');
+        goBtn.disabled = true;
+
+        try {
+            await phase1(domain);
+            await delay(300);
+            await phase2(domain);
+            await delay(300);
+            await phase3(domain);
+        } catch (e) {
+            addStep('✗', `Unexpected error: ${e.message}`);
+        }
+
+        goBtn.disabled = false;
+    }
+
+    // Phase 1: Agent-readiness checks
+    async function phase1(domain) {
+        addPhaseLabel('Agent Readiness');
+
+        // Check reachability
+        let step = addStep('⏳', `Checking if <strong>${domain}</strong> is reachable...`);
+        try {
+            const resp = await proxyFetch(`https://${domain}/robots.txt`);
+            if (resp.ok || resp.status === 404) {
+                updateStep(step, '✓', `<strong>${domain}</strong> is reachable.`);
+            } else {
+                updateStep(step, '✗', `<strong>${domain}</strong> returned status ${resp.status}. May not be accessible.`);
+                return;
+            }
+        } catch (e) {
+            updateStep(step, '✗', `Could not reach <strong>${domain}</strong>. Check the domain and try again.`);
+            return;
+        }
+
+        await delay(400);
+
+        // robots.txt
+        step = addStep('⏳', 'Fetching robots.txt to see which AI agents are welcome...');
+        try {
+            const resp = await proxyFetch(`https://${domain}/robots.txt`);
+            if (resp.ok) {
+                const text = await resp.text();
+                const analysis = analyzeRobotsTxt(text);
+                updateStep(step, '✓',
+                    `Found robots.txt — <strong>${analysis.allowed}/${AI_AGENTS.length}</strong> known AI agents are allowed.`,
+                    analysis.blocked.length > 0 ? `Blocked: ${analysis.blocked.join(', ')}` : 'All checked agents are allowed.',
+                    text
+                );
+            } else {
+                updateStep(step, '–', 'No robots.txt found — all agents are implicitly allowed.');
+            }
+        } catch (e) {
+            updateStep(step, '–', 'Could not fetch robots.txt.');
+        }
+
+        await delay(400);
+
+        // llms.txt
+        step = addStep('⏳', 'Looking for an llms.txt file...');
+        try {
+            const resp = await proxyFetch(`https://${domain}/llms.txt`);
+            if (resp.ok) {
+                const text = await resp.text();
+                updateStep(step, '✓', 'Found it! This site provides context for LLMs.',
+                    `${text.split('\n').length} lines`,
+                    text
+                );
+            } else {
+                updateStep(step, '–', 'No llms.txt present.');
+            }
+        } catch (e) {
+            updateStep(step, '–', 'No llms.txt present.');
+        }
+
+        await delay(400);
+
+        // agents.md
+        step = addStep('⏳', 'Checking for an agents.md manifest...');
+        try {
+            const resp = await proxyFetch(`https://${domain}/agents.md`);
+            if (resp.ok) {
+                const text = await resp.text();
+                updateStep(step, '✓', 'Found an agents.md file.',
+                    `${text.split('\n').length} lines`,
+                    text
+                );
+            } else {
+                updateStep(step, '–', 'No agents.md present.');
+            }
+        } catch (e) {
+            updateStep(step, '–', 'No agents.md present.');
+        }
+
+        await delay(400);
+
+        // skills endpoints
+        step = addStep('⏳', 'Looking for skill discovery endpoints...');
+        let foundSkills = false;
+        try {
+            const resp1 = await proxyFetch(`https://${domain}/skills/`);
+            if (resp1.ok) {
+                const text = await resp1.text();
+                updateStep(step, '✓', 'Found a /skills/ endpoint.', null, text);
+                foundSkills = true;
+            }
+        } catch (e) {}
+        if (!foundSkills) {
+            try {
+                const resp2 = await proxyFetch(`https://${domain}/agent-skills/`);
+                if (resp2.ok) {
+                    const text = await resp2.text();
+                    updateStep(step, '✓', 'Found an /agent-skills/ endpoint.', null, text);
+                    foundSkills = true;
+                }
+            } catch (e) {}
+        }
+        if (!foundSkills) {
+            updateStep(step, '–', 'No skill discovery endpoints found.');
+        }
+    }
+
+    // Phase 2: UCP discovery
+    async function phase2(domain) {
+        addPhaseLabel('UCP Discovery');
+
+        const step = addStep('⏳', `Checking for a UCP profile at <code>/.well-known/ucp</code>...`);
+        try {
+            const resp = await proxyFetch(`https://${domain}/.well-known/ucp`);
+            if (resp.ok) {
+                const text = await resp.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    updateStep(step, '✗', 'Found a file at /.well-known/ucp but it is not valid JSON.', null, text);
+                    return;
+                }
+
+                // Parse capabilities
+                const capabilities = extractCapabilities(data);
+                const mcpUrl = extractMcpEndpoint(data, domain);
+
+                let detail = '';
+                if (capabilities.length > 0) {
+                    detail = `Capabilities: ${capabilities.join(', ')}`;
+                }
+                if (mcpUrl) {
+                    detail += (detail ? ' | ' : '') + `MCP endpoint: ${mcpUrl}`;
+                    mcpEndpoint = mcpUrl;
+                }
+
+                updateStep(step, '✓',
+                    'Found it! This store publishes a UCP manifest.',
+                    detail || 'Manifest retrieved.',
+                    data
+                );
+            } else {
+                updateStep(step, '✗', 'No UCP manifest found at this domain. This store may not have UCP enabled yet.');
+
+                // Try the Shopify convention
+                await delay(300);
+                const step2 = addStep('⏳', `Trying Shopify MCP endpoint convention: <code>/api/ucp/mcp</code>...`);
+                try {
+                    const mcpResp = await proxyFetch(`https://${domain}/api/ucp/mcp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ jsonrpc: '2.0', method: 'tools/list', id: 1, params: {} })
+                    });
+                    if (mcpResp.ok) {
+                        mcpEndpoint = `https://${domain}/api/ucp/mcp`;
+                        updateStep(step2, '✓', `MCP endpoint found at <code>/api/ucp/mcp</code> (no UCP manifest, but endpoint responds).`);
+                    } else {
+                        updateStep(step2, '✗', 'No MCP endpoint responding at the standard Shopify path either.');
+                    }
+                } catch (e) {
+                    updateStep(step2, '✗', 'Could not connect to MCP endpoint.');
+                }
+            }
+        } catch (e) {
+            updateStep(step, '✗', `Error fetching UCP manifest: ${e.message}`);
+        }
+    }
+
+    // Phase 3: MCP interaction
+    async function phase3(domain) {
+        if (!mcpEndpoint) {
+            // Try default Shopify endpoint as last resort
+            mcpEndpoint = `https://${domain}/api/ucp/mcp`;
+        }
+
+        addPhaseLabel('MCP Interaction');
+
+        const step = addStep('⏳', `Connecting to MCP endpoint at <code>${mcpEndpoint}</code>...`);
+
+        try {
+            const resp = await proxyFetch(mcpEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/list',
+                    id: 1,
+                    params: {}
+                })
+            });
+
+            if (!resp.ok) {
+                updateStep(step, '✗', `MCP endpoint returned status ${resp.status}. The store might restrict agent access.`);
+                return;
+            }
+
+            const text = await resp.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                updateStep(step, '✗', 'MCP endpoint responded but not with valid JSON.', null, text);
+                return;
+            }
+
+            const tools = extractTools(data);
+            if (tools.length > 0) {
+                updateStep(step, '✓',
+                    `Connected! This store's MCP server offers <strong>${tools.length}</strong> tools:`,
+                    tools.map(t => t.name + (t.description ? ` — ${t.description}` : '')).join('<br>'),
+                    data
+                );
+
+                // Show search interface if catalog tool available
+                if (tools.some(t => t.name === 'search_catalog')) {
+                    await delay(300);
+                    showSearchInterface();
+                }
+            } else {
+                updateStep(step, '✓', 'Connected to MCP endpoint, but no tools were listed.', null, data);
+            }
+        } catch (e) {
+            updateStep(step, '✗', `Could not connect to MCP endpoint: ${e.message}`);
+        }
+    }
+
+    // Search interface
+    function showSearchInterface() {
+        const section = document.createElement('div');
+        section.className = 'search-section';
+        section.innerHTML = `
+            <p>Want to see what's in their catalog? Search below.</p>
+            <div class="search-row">
+                <input type="text" id="search-input" placeholder="e.g. running shoes, candles, t-shirts...">
+                <button onclick="searchCatalog()">Search</button>
+            </div>
+            <div class="product-results" id="product-results"></div>
+        `;
+        log.appendChild(section);
+
+        document.getElementById('search-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchCatalog();
+        });
+    }
+
+    async function searchCatalog() {
+        const query = document.getElementById('search-input').value.trim();
+        if (!query) return;
+
+        const results = document.getElementById('product-results');
+        results.innerHTML = '<div class="step"><div class="step-header"><span class="step-icon">⏳</span><span class="step-text">Searching...</span></div></div>';
+
+        try {
+            const resp = await proxyFetch(mcpEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/call',
+                    id: 2,
+                    params: {
+                        name: 'search_catalog',
+                        arguments: {
+                            meta: {
+                                'ucp-agent': {
+                                    profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json'
+                                }
+                            },
+                            catalog: {
+                                query: query,
+                                pagination: { limit: 5 }
+                            }
+                        }
+                    }
+                })
+            });
+
+            const data = await resp.json();
+            const products = extractProducts(data);
+
+            if (products.length > 0) {
+                results.innerHTML = products.map(p => `
+                    <div class="product-card">
+                        <div class="name">${escapeHtml(p.name)}</div>
+                        ${p.price ? `<div class="price">${escapeHtml(p.price)}</div>` : ''}
+                        ${p.availability ? `<div class="availability">${escapeHtml(p.availability)}</div>` : ''}
+                    </div>
+                `).join('');
+
+                results.innerHTML += `<details class="step-raw"><summary>Show raw response</summary><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></details>`;
+            } else {
+                results.innerHTML = `<div class="step-detail">No products found for "${escapeHtml(query)}".</div>
+                    <details class="step-raw"><summary>Show raw response</summary><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></details>`;
+            }
+        } catch (e) {
+            results.innerHTML = `<div class="step-detail">Search failed: ${escapeHtml(e.message)}</div>`;
+        }
+    }
+
+    // Parsing helpers
+    function analyzeRobotsTxt(text) {
+        const lines = text.toLowerCase().split('\n');
+        const blocked = [];
+
+        for (const agent of AI_AGENTS) {
+            const agentLower = agent.toLowerCase();
+            let inAgentBlock = false;
+            let isBlocked = false;
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('user-agent:')) {
+                    const ua = trimmed.replace('user-agent:', '').trim();
+                    inAgentBlock = (ua === agentLower || ua === '*');
+                } else if (inAgentBlock && trimmed.startsWith('disallow:')) {
+                    const path = trimmed.replace('disallow:', '').trim();
+                    if (path === '/' || path === '/*') {
+                        isBlocked = true;
+                    }
+                } else if (trimmed.startsWith('user-agent:')) {
+                    inAgentBlock = false;
+                }
+            }
+
+            if (isBlocked) blocked.push(agent);
+        }
+
+        return {
+            allowed: AI_AGENTS.length - blocked.length,
+            blocked: blocked
+        };
+    }
+
+    function extractCapabilities(ucpData) {
+        const caps = [];
+        if (ucpData.services) {
+            for (const [key, val] of Object.entries(ucpData.services)) {
+                if (val.capabilities) {
+                    caps.push(...Object.keys(val.capabilities).map(c => `${key}.${c}`));
+                } else {
+                    caps.push(key);
+                }
+            }
+        }
+        if (ucpData.capabilities) {
+            caps.push(...(Array.isArray(ucpData.capabilities) ? ucpData.capabilities : Object.keys(ucpData.capabilities)));
+        }
+        return caps;
+    }
+
+    function extractMcpEndpoint(ucpData, domain) {
+        // Look for MCP transport in various possible structures
+        if (ucpData.transport === 'mcp' && ucpData.endpoint) return ucpData.endpoint;
+        if (ucpData.mcp && ucpData.mcp.endpoint) return ucpData.mcp.endpoint;
+        if (ucpData.services) {
+            for (const svc of Object.values(ucpData.services)) {
+                if (svc.transport === 'mcp' && svc.endpoint) return svc.endpoint;
+                if (svc.mcp && svc.mcp.endpoint) return svc.mcp.endpoint;
+            }
+        }
+        // Default Shopify convention
+        return `https://${domain}/api/ucp/mcp`;
+    }
+
+    function extractTools(data) {
+        if (data.result && data.result.tools) return data.result.tools;
+        if (data.tools) return data.tools;
+        if (data.result && Array.isArray(data.result)) return data.result;
+        return [];
+    }
+
+    function extractProducts(data) {
+        const products = [];
+        let source = null;
+
+        if (data.result && data.result.structuredContent && data.result.structuredContent.products) {
+            source = data.result.structuredContent.products;
+        } else if (data.result && data.result.content) {
+            // Try parsing content blocks
+            for (const block of (Array.isArray(data.result.content) ? data.result.content : [])) {
+                if (block.type === 'text') {
+                    try {
+                        const parsed = JSON.parse(block.text);
+                        if (parsed.products) source = parsed.products;
+                    } catch (e) {}
+                }
+            }
+        }
+
+        if (source && Array.isArray(source)) {
+            for (const p of source.slice(0, 10)) {
+                products.push({
+                    name: p.name || p.title || 'Unnamed product',
+                    price: p.price || (p.offers && p.offers.price) || '',
+                    availability: p.availability || (p.offers && p.offers.availability) || ''
+                });
+            }
+        }
+
+        return products;
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+    "name": "UCP Explorer",
+    "description": "A transparency tool that shows how AI agents discover and interact with commerce endpoints. For educational and diagnostic purposes only.",
+    "url": "https://kylerisley.com/tools/ucp-explorer/",
+    "contact": "https://kylerisley.com",
+    "capabilities": ["catalog.search", "catalog.lookup"]
+}
