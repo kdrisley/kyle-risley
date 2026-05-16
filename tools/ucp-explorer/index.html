@@ -769,10 +769,10 @@
                     text
                 );
             } else {
-                updateStep(step, '–', `No <code>/llms.txt</code> present.`, `GET ${llmsUrl} → HTTP ${resp.status}`);
+                updateStep(step, '–', `No <code>/llms.txt</code> present. This is normal — llms.txt is an emerging convention and most sites don't publish one yet.`, `GET ${llmsUrl} → HTTP ${resp.status}`);
             }
         } catch (e) {
-            updateStep(step, '–', `Could not fetch <code>/llms.txt</code>.`, `GET ${llmsUrl} → Connection failed`);
+            updateStep(step, '–', `No <code>/llms.txt</code> present. This is normal — llms.txt is an emerging convention and most sites don't publish one yet.`, `GET ${llmsUrl} → Connection failed`);
         }
 
         await delay(400);
@@ -789,10 +789,10 @@
                     text
                 );
             } else {
-                updateStep(step, '–', `No <code>/agents.md</code> present.`, `GET ${agentsUrl} → HTTP ${resp.status}`);
+                updateStep(step, '–', `No <code>/agents.md</code> present. This is expected — agents.md is an early-stage convention for providing instructions to AI agents.`, `GET ${agentsUrl} → HTTP ${resp.status}`);
             }
         } catch (e) {
-            updateStep(step, '–', `Could not fetch <code>/agents.md</code>.`, `GET ${agentsUrl} → Connection failed`);
+            updateStep(step, '–', `No <code>/agents.md</code> present. This is expected — agents.md is an early-stage convention for providing instructions to AI agents.`, `GET ${agentsUrl} → Connection failed`);
         }
 
         await delay(400);
