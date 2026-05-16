@@ -4,13 +4,12 @@
 
 const DEFAULT_ALLOWED_PATHS = [
   '/.well-known/ucp',
+  '/.well-known/agent-skills/',
   '/api/ucp/mcp',
   '/api/mcp',
   '/robots.txt',
   '/llms.txt',
-  '/agents.md',
-  '/skills/',
-  '/agent-skills/'
+  '/agents.md'
 ];
 
 async function getAllowedPaths(env) {
