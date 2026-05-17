@@ -1550,7 +1550,7 @@
             url: p.url || '',
             image: image,
             totalVariants: p.total_variants || p.totalVariants || (p.variants && p.variants.length) || 0,
-            options: p.options ? p.options.map(o => `${o.name}: ${(o.values || []).join(', ')}`) : [],
+            options: p.options ? p.options.filter(o => !(o.name === 'Title' && o.values && o.values.length === 1 && o.values[0] === 'Default Title')).map(o => `${o.name}: ${(o.values || []).join(', ')}`) : [],
             variants: p.variants || []
         };
     }
