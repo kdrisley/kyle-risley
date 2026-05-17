@@ -26,6 +26,7 @@ function createMockDOM() {
             innerHTML: '',
             classList: { add() {}, remove() {} },
             appendChild(el) { logChildren.push(el); },
+            addEventListener() {},
             get children() { return logChildren; }
         },
         'domain-input': { value: '', addEventListener() {} },
@@ -66,7 +67,8 @@ function loadExplorer(fetchImpl) {
     const factory = new Function(
         EXPLORE_JS +
         '\nreturn { startExploration, phase2, phase3, addStep, updateStep, buildStepHtml,' +
-        ' iconClass, escapeHtml, extractCapabilities, extractMcpEndpoint, extractTools, formatPrice };'
+        ' reqResponseHtml, jsonBoxHtml, iconClass, escapeHtml, extractCapabilities,' +
+        ' extractMcpEndpoint, extractTools, formatPrice };'
     );
 
     return { exported: factory(), elements, logChildren };
@@ -171,6 +173,29 @@ describe('buildStepHtml()', () => {
 
         const nameOf = h => h.match(/name="([^"]+)"/)[1];
         assert.notEqual(nameOf(first), nameOf(second), 'distinct groups must not share a name');
+    });
+
+    test('Request/Response boxes carry copy and expand controls', () => {
+        const { exported } = loadExplorer();
+        const html = exported.buildStepHtml('✓', 't', 'd', { a: 1 }, { b: 2 });
+
+        assert.match(html, /class="json-box" data-label="Request"/);
+        assert.match(html, /class="json-box" data-label="Response"/);
+        assert.equal((html.match(/json-copy/g) || []).length, 2, 'a copy button per box');
+        assert.equal((html.match(/json-expand/g) || []).length, 2, 'an expand button per box');
+    });
+});
+
+// --- reqResponseHtml() --------------------------------------------------
+describe('reqResponseHtml()', () => {
+    test('wraps both request and response in a json-box with controls', () => {
+        const { exported } = loadExplorer();
+        const html = exported.reqResponseHtml({ query: 'x' }, { ok: true });
+
+        const labels = [...html.matchAll(/class="json-box" data-label="([^"]+)"/g)].map(m => m[1]);
+        assert.deepEqual(labels, ['Request', 'Response']);
+        assert.equal((html.match(/json-copy/g) || []).length, 2);
+        assert.equal((html.match(/json-expand/g) || []).length, 2);
     });
 });
 

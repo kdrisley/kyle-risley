@@ -18,6 +18,7 @@ module.exports = [
                 document: 'readonly',
                 window: 'readonly',
                 fetch: 'readonly',
+                navigator: 'readonly',
                 setTimeout: 'readonly',
                 console: 'readonly'
             }

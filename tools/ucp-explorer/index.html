@@ -361,6 +361,132 @@
             overflow-y: auto;
         }
 
+        /* JSON box: copy + expand controls */
+        .json-box {
+            position: relative;
+        }
+
+        .json-box-actions {
+            position: absolute;
+            top: 14px;
+            right: 12px;
+            display: flex;
+            gap: 4px;
+            z-index: 1;
+        }
+
+        .json-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            color: #9aa0a6;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .json-action:hover,
+        .json-action:focus-visible {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+            outline: none;
+        }
+
+        .json-action svg {
+            width: 15px;
+            height: 15px;
+            display: block;
+        }
+
+        .json-action.copied {
+            color: #4ade80;
+        }
+
+        /* Expanded JSON viewer */
+        .json-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .json-modal[hidden] {
+            display: none;
+        }
+
+        .json-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            animation: json-modal-fade 0.15s ease;
+        }
+
+        .json-modal-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 85vw;
+            max-width: 1000px;
+            height: 85vh;
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+            animation: json-modal-pop 0.15s ease;
+        }
+
+        .json-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .json-modal-title {
+            color: #d4d4d4;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .json-modal-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .json-modal-content {
+            flex: 1;
+            margin: 0;
+            padding: 16px;
+            overflow: auto;
+            font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #d4d4d4;
+            background: #1e1e1e;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        @keyframes json-modal-fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes json-modal-pop {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .phase-label {
             font-size: 12px;
             font-weight: 600;
@@ -502,6 +628,15 @@
 
             .step-toggles {
                 margin-left: 0;
+            }
+
+            .json-modal {
+                padding: 12px;
+            }
+
+            .json-modal-panel {
+                width: 95vw;
+                height: 90vh;
             }
 
             .tool-grid {

@@ -20,6 +20,16 @@ domainInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') startExploration();
 });
 
+// Delegated handler for the copy/expand controls on every JSON box. The log
+// element is stable across re-renders, so a single listener covers all boxes,
+// including ones added later by updateStep() and the interactive panels.
+log.addEventListener('click', (e) => {
+    const copyBtn = e.target.closest('.json-copy');
+    if (copyBtn) { copyJsonBox(copyBtn); return; }
+    const expandBtn = e.target.closest('.json-expand');
+    if (expandBtn) { openJsonModal(expandBtn.closest('.json-box')); return; }
+});
+
 function addPhaseLabel(text) {
     const el = document.createElement('div');
     el.className = 'phase-label';
@@ -39,6 +49,98 @@ function formatRaw(data) {
     return escapeHtml(typeof data === 'string' ? data : JSON.stringify(data, null, 2));
 }
 
+// --- JSON box: copy + expand controls ---------------------------------------
+
+const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+const EXPAND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>';
+const SHRINK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/></svg>';
+
+// Renders a JSON box: a <pre> plus a copy and an expand button. `label`
+// ("Request"/"Response") is carried on data-label for use as the modal title.
+function jsonBoxHtml(label, data) {
+    return `<div class="json-box" data-label="${label}">
+        <div class="json-box-actions">
+            <button type="button" class="json-action json-copy" title="Copy" aria-label="Copy">${COPY_ICON}</button>
+            <button type="button" class="json-action json-expand" title="Expand" aria-label="Expand">${EXPAND_ICON}</button>
+        </div>
+        <pre>${formatRaw(data)}</pre>
+    </div>`;
+}
+
+// Copies text to the clipboard and briefly flashes the button as confirmation.
+// navigator.clipboard is undefined outside secure contexts (e.g. file://).
+function copyText(text, btn) {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = CHECK_ICON;
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = COPY_ICON;
+        }, 1200);
+    }).catch(() => {});
+}
+
+function copyJsonBox(btn) {
+    const box = btn.closest('.json-box');
+    const pre = box && box.querySelector('pre');
+    if (pre) copyText(pre.textContent, btn);
+}
+
+// The expanded JSON viewer is a single lazily-created overlay, shared by every
+// box. Building it on first use keeps module load free of document.body access.
+let jsonModal = null;
+
+function getJsonModal() {
+    if (jsonModal) return jsonModal;
+    jsonModal = document.createElement('div');
+    jsonModal.className = 'json-modal';
+    jsonModal.hidden = true;
+    jsonModal.innerHTML = `
+        <div class="json-modal-backdrop"></div>
+        <div class="json-modal-panel" role="dialog" aria-modal="true" aria-label="JSON viewer">
+            <div class="json-modal-header">
+                <span class="json-modal-title"></span>
+                <div class="json-modal-actions">
+                    <button type="button" class="json-action json-modal-copy" title="Copy" aria-label="Copy">${COPY_ICON}</button>
+                    <button type="button" class="json-action json-modal-shrink" title="Shrink" aria-label="Shrink">${SHRINK_ICON}</button>
+                </div>
+            </div>
+            <pre class="json-modal-content"></pre>
+        </div>`;
+    document.body.appendChild(jsonModal);
+
+    jsonModal.querySelector('.json-modal-backdrop').addEventListener('click', closeJsonModal);
+    jsonModal.querySelector('.json-modal-shrink').addEventListener('click', closeJsonModal);
+    jsonModal.querySelector('.json-modal-copy').addEventListener('click', (e) => {
+        copyText(jsonModal.querySelector('.json-modal-content').textContent, e.currentTarget);
+    });
+    return jsonModal;
+}
+
+function escCloseModal(e) {
+    if (e.key === 'Escape') closeJsonModal();
+}
+
+function openJsonModal(box) {
+    const pre = box && box.querySelector('pre');
+    if (!pre) return;
+    const modal = getJsonModal();
+    modal.querySelector('.json-modal-title').textContent = box.dataset.label || 'JSON';
+    modal.querySelector('.json-modal-content').innerHTML = syntaxHighlight(pre.textContent);
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', escCloseModal);
+}
+
+function closeJsonModal() {
+    if (!jsonModal || jsonModal.hidden) return;
+    jsonModal.hidden = true;
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', escCloseModal);
+}
+
 function buildStepHtml(icon, text, detail, req, raw) {
     let html = `<div class="step-header">
         <span class="step-icon ${iconClass(icon)}">${icon}</span>
@@ -55,13 +157,13 @@ function buildStepHtml(icon, text, detail, req, raw) {
         if (req) {
             html += `<details class="step-raw" name="${groupName}">
                 <summary>Request</summary>
-                <pre>${formatRaw(req)}</pre>
+                ${jsonBoxHtml('Request', req)}
             </details>`;
         }
         if (raw) {
             html += `<details class="step-raw" name="${groupName}">
                 <summary>Response</summary>
-                <pre>${formatRaw(raw)}</pre>
+                ${jsonBoxHtml('Response', raw)}
             </details>`;
         }
         html += '</div>';
@@ -445,11 +547,11 @@ function reqResponseHtml(reqBody, resData) {
     return `<div class="step-toggles">
         <details class="step-raw" name="${groupName}">
             <summary>Request</summary>
-            <pre>${formatRaw({ method: 'POST', url: mcpEndpoint, headers: { 'Content-Type': 'application/json' }, body: reqBody })}</pre>
+            ${jsonBoxHtml('Request', { method: 'POST', url: mcpEndpoint, headers: { 'Content-Type': 'application/json' }, body: reqBody })}
         </details>
         <details class="step-raw" name="${groupName}">
             <summary>Response</summary>
-            <pre>${formatRaw(resData)}</pre>
+            ${jsonBoxHtml('Response', resData)}
         </details>
     </div>`;
 }
