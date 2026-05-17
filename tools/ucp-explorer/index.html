@@ -321,9 +321,17 @@
             overflow-wrap: anywhere;
         }
 
-        .step-raw {
+        .step-toggles {
+            display: flex;
+            gap: 8px;
             margin-top: 8px;
             margin-left: 34px;
+            flex-wrap: wrap;
+        }
+
+        .step-raw {
+            flex: 1;
+            min-width: 200px;
         }
 
         .step-raw summary {
@@ -493,8 +501,13 @@
                 font-size: 12px;
             }
 
-            .step-raw {
+            .step-toggles {
                 margin-left: 0;
+                flex-direction: column;
+            }
+
+            .step-raw {
+                min-width: 0;
             }
 
             .tool-grid {
@@ -990,10 +1003,12 @@
         return 'step-icon-loading';
     }
 
-    function addStep(icon, text, detail, raw) {
-        const step = document.createElement('div');
-        step.className = 'step';
+    function formatRaw(data) {
+        if (!data) return '';
+        return escapeHtml(typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+    }
 
+    function buildStepHtml(icon, text, detail, req, raw) {
         let html = `<div class="step-header">
             <span class="step-icon ${iconClass(icon)}">${icon}</span>
             <span class="step-text">${text}</span>
@@ -1003,35 +1018,37 @@
             html += `<div class="step-detail">${detail}</div>`;
         }
 
-        if (raw) {
-            html += `<details class="step-raw">
-                <summary>Show raw response</summary>
-                <pre>${escapeHtml(typeof raw === 'string' ? raw : JSON.stringify(raw, null, 2))}</pre>
-            </details>`;
+        if (req || raw) {
+            html += '<div class="step-toggles">';
+            if (req) {
+                html += `<details class="step-raw">
+                    <summary>Request</summary>
+                    <pre>${formatRaw(req)}</pre>
+                </details>`;
+            }
+            if (raw) {
+                html += `<details class="step-raw">
+                    <summary>Response</summary>
+                    <pre>${formatRaw(raw)}</pre>
+                </details>`;
+            }
+            html += '</div>';
         }
 
-        step.innerHTML = html;
+        return html;
+    }
+
+    function addStep(icon, text, detail, raw, req) {
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.innerHTML = buildStepHtml(icon, text, detail, req, raw);
         log.appendChild(step);
         step.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         return step;
     }
 
-    function updateStep(step, icon, text, detail, raw) {
-        let html = `<div class="step-header">
-            <span class="step-icon ${iconClass(icon)}">${icon}</span>
-            <span class="step-text">${text}</span>
-        </div>`;
-
-        if (detail) {
-            html += `<div class="step-detail">${detail}</div>`;
-        }
-
-        if (raw) {
-            html += `<details class="step-raw">
-                <summary>Show raw response</summary>
-                <pre>${escapeHtml(typeof raw === 'string' ? raw : JSON.stringify(raw, null, 2))}</pre>
-            </details>`;
-        }
+    function updateStep(step, icon, text, detail, raw, req) {
+        step.innerHTML = buildStepHtml(icon, text, detail, req, raw);
 
         step.innerHTML = html;
     }
@@ -1078,7 +1095,8 @@
         addPhaseLabel('UCP Profile Discovery');
 
         const ucpUrl = `https://${domain}/.well-known/ucp`;
-        const step = addStep('⏳', `Checking for a UCP profile at <code>/.well-known/ucp</code>...`, `GET ${ucpUrl}`);
+        const ucpReq = { method: 'GET', url: ucpUrl };
+        const step = addStep('⏳', `Checking for a UCP profile at <code>/.well-known/ucp</code>...`, `GET ${ucpUrl}`, null, ucpReq);
         try {
             const resp = await proxyFetch(ucpUrl);
             if (resp.ok) {
@@ -1087,11 +1105,10 @@
                 try {
                     data = JSON.parse(text);
                 } catch (e) {
-                    updateStep(step, '✗', `Found a file at <code>/.well-known/ucp</code> but it is not valid JSON.`, `GET ${ucpUrl} → HTTP ${resp.status} | Response is not valid JSON`, text);
+                    updateStep(step, '✗', `Found a file at <code>/.well-known/ucp</code> but it is not valid JSON.`, `GET ${ucpUrl} → HTTP ${resp.status} | Response is not valid JSON`, text, ucpReq);
                     return;
                 }
 
-                // Parse capabilities
                 const capabilities = extractCapabilities(data);
                 const mcpUrl = extractMcpEndpoint(data, domain);
 
@@ -1107,29 +1124,31 @@
                 updateStep(step, '✓',
                     'Found it! This store publishes a UCP manifest.',
                     detail,
-                    data
+                    data,
+                    ucpReq
                 );
             } else {
-                updateStep(step, '✗', `No UCP manifest found at this domain. This store may not have UCP enabled yet.`, `GET ${ucpUrl} → HTTP ${resp.status}`);
+                updateStep(step, '✗', `No UCP manifest found at this domain. This store may not have UCP enabled yet.`, `GET ${ucpUrl} → HTTP ${resp.status}`, null, ucpReq);
 
-                // Try the Shopify convention
                 await delay(300);
                 const fallbackUrl = `https://${domain}/api/ucp/mcp`;
-                const step2 = addStep('⏳', `Trying Shopify MCP endpoint convention: <code>/api/ucp/mcp</code>...`, `POST ${fallbackUrl}`);
+                const fallbackBody = { jsonrpc: '2.0', method: 'tools/list', id: 1, params: { _meta: { 'ucp-agent': { profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json' } } } };
+                const fallbackReq = { method: 'POST', url: fallbackUrl, headers: { 'Content-Type': 'application/json' }, body: fallbackBody };
+                const step2 = addStep('⏳', `Trying Shopify MCP endpoint convention: <code>/api/ucp/mcp</code>...`, `POST ${fallbackUrl}`, null, fallbackReq);
                 try {
                     const mcpResp = await proxyFetch(fallbackUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ jsonrpc: '2.0', method: 'tools/list', id: 1, params: { _meta: { 'ucp-agent': { profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json' } } } })
+                        body: JSON.stringify(fallbackBody)
                     });
                     if (mcpResp.ok) {
                         mcpEndpoint = fallbackUrl;
-                        updateStep(step2, '✓', `MCP endpoint found at <code>/api/ucp/mcp</code> (no UCP manifest, but endpoint responds).`, `POST ${fallbackUrl} → HTTP ${mcpResp.status}`);
+                        updateStep(step2, '✓', `MCP endpoint found at <code>/api/ucp/mcp</code> (no UCP manifest, but endpoint responds).`, `POST ${fallbackUrl} → HTTP ${mcpResp.status}`, null, fallbackReq);
                     } else {
-                        updateStep(step2, '✗', `No MCP endpoint responding at the standard Shopify path either.`, `POST ${fallbackUrl} → HTTP ${mcpResp.status}`);
+                        updateStep(step2, '✗', `No MCP endpoint responding at the standard Shopify path either.`, `POST ${fallbackUrl} → HTTP ${mcpResp.status}`, null, fallbackReq);
                     }
                 } catch (e) {
-                    updateStep(step2, '✗', `Could not connect to MCP endpoint.`, `POST ${fallbackUrl} → Connection failed`);
+                    updateStep(step2, '✗', `Could not connect to MCP endpoint.`, `POST ${fallbackUrl} → Connection failed`, null, fallbackReq);
                 }
             }
         } catch (e) {
@@ -1154,29 +1173,30 @@
 
         let connected = false;
         for (const endpoint of endpoints) {
-            const step = addStep('⏳', `Connecting to MCP endpoint at <code>${endpoint}</code>...`, `POST ${endpoint} | Method: tools/list`);
+            const toolsListBody = {
+                jsonrpc: '2.0',
+                method: 'tools/list',
+                id: 1,
+                params: {
+                    _meta: {
+                        'ucp-agent': {
+                            profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json'
+                        }
+                    }
+                }
+            };
+            const mcpReq = { method: 'POST', url: endpoint, headers: { 'Content-Type': 'application/json' }, body: toolsListBody };
+            const step = addStep('⏳', `Connecting to MCP endpoint at <code>${endpoint}</code>...`, `POST ${endpoint} | Method: tools/list`, null, mcpReq);
 
             try {
-                // Try with agent profile meta (required for UCP endpoints)
                 const resp = await proxyFetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        method: 'tools/list',
-                        id: 1,
-                        params: {
-                            _meta: {
-                                'ucp-agent': {
-                                    profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json'
-                                }
-                            }
-                        }
-                    })
+                    body: JSON.stringify(toolsListBody)
                 });
 
             if (!resp.ok) {
-                updateStep(step, '–', `Endpoint returned HTTP ${resp.status}. Trying next endpoint...`, `POST ${endpoint} → HTTP ${resp.status}`);
+                updateStep(step, '–', `Endpoint returned HTTP ${resp.status}. Trying next endpoint...`, `POST ${endpoint} → HTTP ${resp.status}`, null, mcpReq);
                 await delay(300);
                 continue;
             }
@@ -1186,7 +1206,7 @@
             try {
                 data = JSON.parse(text);
             } catch (e) {
-                updateStep(step, '–', `Endpoint responded (HTTP ${resp.status}) but not with valid JSON. Trying next...`, `POST ${endpoint} → HTTP ${resp.status} | Invalid JSON`, text);
+                updateStep(step, '–', `Endpoint responded (HTTP ${resp.status}) but not with valid JSON. Trying next...`, `POST ${endpoint} → HTTP ${resp.status} | Invalid JSON`, text, mcpReq);
                 await delay(300);
                 continue;
             }
@@ -1197,25 +1217,24 @@
                 updateStep(step, '✓',
                     `Connected! This store's MCP server offers <strong>${tools.length}</strong> tools:`,
                     `POST ${endpoint} → HTTP 200 | ${tools.length} tools discovered`,
-                    data
+                    data,
+                    mcpReq
                 );
 
-                // Render tool cards
                 renderToolCards(step, tools);
 
-                // Show interactive section
                 await delay(300);
                 showInteractiveSection(tools);
 
                 connected = true;
                 break;
             } else {
-                updateStep(step, '–', `Connected (HTTP 200) but no tools were listed in the response.`, `POST ${endpoint} → HTTP 200 | 0 tools returned`, data);
+                updateStep(step, '–', `Connected (HTTP 200) but no tools were listed in the response.`, `POST ${endpoint} → HTTP 200 | 0 tools returned`, data, mcpReq);
                 await delay(300);
                 continue;
             }
         } catch (e) {
-            updateStep(step, '–', `Could not connect to <code>${endpoint}</code>.`, `POST ${endpoint} → Connection failed: ${e.message}`);
+            updateStep(step, '–', `Could not connect to <code>${endpoint}</code>.`, `POST ${endpoint} → Connection failed: ${e.message}`, null, mcpReq);
             await delay(300);
             continue;
         }
