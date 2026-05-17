@@ -154,6 +154,24 @@ describe('buildStepHtml()', () => {
         assert.match(withBoth, /<summary>Request<\/summary>/);
         assert.match(withBoth, /<summary>Response<\/summary>/);
     });
+
+    test('Request and Response in one group share a name (mutually exclusive)', () => {
+        const { exported } = loadExplorer();
+        const html = exported.buildStepHtml('✓', 't', 'd', { req: 1 }, { res: 1 });
+
+        const names = [...html.matchAll(/<details class="step-raw" name="([^"]+)"/g)].map(m => m[1]);
+        assert.equal(names.length, 2, 'expected two named <details>');
+        assert.equal(names[0], names[1], 'both toggles in a pair must share a name');
+    });
+
+    test('separate toggle groups get distinct names', () => {
+        const { exported } = loadExplorer();
+        const first = exported.buildStepHtml('✓', 't', 'd', { req: 1 }, { res: 1 });
+        const second = exported.buildStepHtml('✓', 't', 'd', { req: 1 }, { res: 1 });
+
+        const nameOf = h => h.match(/name="([^"]+)"/)[1];
+        assert.notEqual(nameOf(first), nameOf(second), 'distinct groups must not share a name');
+    });
 });
 
 // --- addStep() ----------------------------------------------------------

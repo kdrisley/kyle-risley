@@ -323,15 +323,14 @@
 
         .step-toggles {
             display: flex;
+            flex-direction: column;
             gap: 8px;
             margin-top: 8px;
             margin-left: 34px;
-            flex-wrap: wrap;
         }
 
         .step-raw {
-            flex: 1;
-            min-width: 200px;
+            min-width: 0;
         }
 
         .step-raw summary {
@@ -503,11 +502,6 @@
 
             .step-toggles {
                 margin-left: 0;
-                flex-direction: column;
-            }
-
-            .step-raw {
-                min-width: 0;
             }
 
             .tool-grid {

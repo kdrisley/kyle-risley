@@ -6,6 +6,10 @@
 const PROXY_BASE = 'https://ucp-proxy.kylerisley.com';
 let currentDomain = '';
 let mcpEndpoint = '';
+// Counter for naming Request/Response <details> pairs. Both toggles in a pair
+// share a name so the browser keeps only one open at a time; each pair gets a
+// unique name so toggles in different steps don't interfere.
+let toggleGroupSeq = 0;
 
 // UI helpers
 const log = document.getElementById('log');
@@ -46,15 +50,16 @@ function buildStepHtml(icon, text, detail, req, raw) {
     }
 
     if (req || raw) {
+        const groupName = `step-toggle-${++toggleGroupSeq}`;
         html += '<div class="step-toggles">';
         if (req) {
-            html += `<details class="step-raw">
+            html += `<details class="step-raw" name="${groupName}">
                 <summary>Request</summary>
                 <pre>${formatRaw(req)}</pre>
             </details>`;
         }
         if (raw) {
-            html += `<details class="step-raw">
+            html += `<details class="step-raw" name="${groupName}">
                 <summary>Response</summary>
                 <pre>${formatRaw(raw)}</pre>
             </details>`;
@@ -436,12 +441,13 @@ function mcpCallWithBody(reqBody) {
 }
 
 function reqResponseHtml(reqBody, resData) {
+    const groupName = `step-toggle-${++toggleGroupSeq}`;
     return `<div class="step-toggles">
-        <details class="step-raw">
+        <details class="step-raw" name="${groupName}">
             <summary>Request</summary>
             <pre>${formatRaw({ method: 'POST', url: mcpEndpoint, headers: { 'Content-Type': 'application/json' }, body: reqBody })}</pre>
         </details>
-        <details class="step-raw">
+        <details class="step-raw" name="${groupName}">
             <summary>Response</summary>
             <pre>${formatRaw(resData)}</pre>
         </details>
