@@ -1387,23 +1387,45 @@
 
     // MCP tool call helper
     let callId = 10;
-    function mcpCall(toolName, args) {
+    function buildMcpRequest(toolName, args) {
+        return {
+            jsonrpc: '2.0',
+            method: 'tools/call',
+            id: callId++,
+            params: {
+                name: toolName,
+                arguments: {
+                    meta: { 'ucp-agent': { profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json' } },
+                    ...args
+                }
+            }
+        };
+    }
+
+    function mcpCallWithBody(reqBody) {
         return proxyFetch(mcpEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                method: 'tools/call',
-                id: callId++,
-                params: {
-                    name: toolName,
-                    arguments: {
-                        meta: { 'ucp-agent': { profile: 'https://kylerisley.com/tools/ucp-explorer/agent-profile.json' } },
-                        ...args
-                    }
-                }
-            })
+            body: JSON.stringify(reqBody)
         });
+    }
+
+    function mcpCall(toolName, args) {
+        const body = buildMcpRequest(toolName, args);
+        return mcpCallWithBody(body);
+    }
+
+    function reqResponseHtml(reqBody, resData) {
+        return `<div class="step-toggles">
+            <details class="step-raw">
+                <summary>Request</summary>
+                <pre>${formatRaw({ method: 'POST', url: mcpEndpoint, headers: { 'Content-Type': 'application/json' }, body: reqBody })}</pre>
+            </details>
+            <details class="step-raw">
+                <summary>Response</summary>
+                <pre>${formatRaw(resData)}</pre>
+            </details>
+        </div>`;
     }
 
     // Catalog search
@@ -1414,15 +1436,18 @@
         const results = document.getElementById('catalog-results');
         results.innerHTML = '<span class="loading-dot">Searching...</span>';
 
+        const reqBody = buildMcpRequest('search_catalog', { catalog: { query, pagination: { limit: 10 } } });
+
         try {
-            const resp = await mcpCall('search_catalog', { catalog: { query, pagination: { limit: 10 } } });
+            const resp = await mcpCallWithBody(reqBody);
             const data = await resp.json();
             const products = extractProducts(data);
 
             updateJsonPane(data);
 
+            let html = '';
             if (products.length > 0) {
-                results.innerHTML = products.map(p => `
+                html += products.map(p => `
                     <div class="product-card" onclick="getProductDetails('${escapeHtml(p.id || '')}')">
                         ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">` : ''}
                         <div class="product-info">
@@ -1434,10 +1459,12 @@
                     </div>
                 `).join('');
             } else {
-                results.innerHTML = `<div class="step-detail">No products found for "${escapeHtml(query)}".</div>`;
+                html += `<div class="step-detail">No products found for "${escapeHtml(query)}".</div>`;
             }
+            html += reqResponseHtml(reqBody, data);
+            results.innerHTML = html;
         } catch (e) {
-            results.innerHTML = `<div class="step-detail">Search failed: ${escapeHtml(e.message)}</div>`;
+            results.innerHTML = `<div class="step-detail">Search failed: ${escapeHtml(e.message)}</div>` + reqResponseHtml(reqBody, { error: e.message });
         }
     }
 
@@ -1456,8 +1483,10 @@
         results.insertBefore(detail, results.firstChild);
         detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
+        const reqBody = buildMcpRequest('get_product_details', { product_id: productId });
+
         try {
-            const resp = await mcpCall('get_product_details', { product_id: productId });
+            const resp = await mcpCallWithBody(reqBody);
             const data = await resp.json();
             updateJsonPane(data);
             const product = extractProductDetail(data);
@@ -1484,9 +1513,10 @@
                 html += `<a href="${escapeHtml(product.url)}" target="_blank" rel="noopener" class="pdp-link">View on ${escapeHtml(currentDomain)}</a>`;
             }
 
+            html += reqResponseHtml(reqBody, data);
             detail.innerHTML = html;
         } catch (e) {
-            detail.innerHTML = `<div class="detail-loading">Failed to load details: ${escapeHtml(e.message)}</div>`;
+            detail.innerHTML = `<div class="detail-loading">Failed to load details: ${escapeHtml(e.message)}</div>` + reqResponseHtml(reqBody, { error: e.message });
         }
     }
 
@@ -1498,22 +1528,27 @@
         const results = document.getElementById('policy-results');
         results.innerHTML = '<span class="loading-dot">Looking up policy...</span>';
 
+        const reqBody = buildMcpRequest('search_shop_policies_and_faqs', { query });
+
         try {
-            const resp = await mcpCall('search_shop_policies_and_faqs', { query });
+            const resp = await mcpCallWithBody(reqBody);
             const data = await resp.json();
             updateJsonPane(data);
             const qaPairs = extractPolicyQA(data);
 
+            let html = '';
             if (qaPairs.length > 0) {
-                results.innerHTML = `<div class="policy-answer">${qaPairs.map(qa =>
+                html += `<div class="policy-answer">${qaPairs.map(qa =>
                     `<div class="policy-qa"><div class="pq">${escapeHtml(qa.question)}</div><div class="pa">${escapeHtml(qa.answer)}</div></div>`
                 ).join('')}</div>`;
             } else {
                 const answer = extractPolicyAnswer(data);
-                results.innerHTML = `<div class="policy-answer">${escapeHtml(answer)}</div>`;
+                html += `<div class="policy-answer">${escapeHtml(answer)}</div>`;
             }
+            html += reqResponseHtml(reqBody, data);
+            results.innerHTML = html;
         } catch (e) {
-            results.innerHTML = `<div class="step-detail">Policy lookup failed: ${escapeHtml(e.message)}</div>`;
+            results.innerHTML = `<div class="step-detail">Policy lookup failed: ${escapeHtml(e.message)}</div>` + reqResponseHtml(reqBody, { error: e.message });
         }
     }
 
