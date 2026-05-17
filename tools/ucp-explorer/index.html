@@ -1444,6 +1444,19 @@
         return [];
     }
 
+    function formatPrice(val) {
+        if (val === undefined || val === null) return '';
+        if (typeof val === 'object' && val.amount !== undefined) {
+            // Amount in cents (e.g. 1299) or dollars (e.g. 12.99)
+            const amt = Number(val.amount);
+            const formatted = amt >= 100 && Number.isInteger(amt) ? (amt / 100).toFixed(2) : amt.toFixed(2);
+            return `$${formatted}`;
+        }
+        if (typeof val === 'number') return `$${val.toFixed(2)}`;
+        if (typeof val === 'string') return val.startsWith('$') ? val : `$${val}`;
+        return String(val);
+    }
+
     function extractProducts(data) {
         const products = [];
         let source = null;
@@ -1468,9 +1481,12 @@
 
                 let price = '';
                 if (p.price_range) {
-                    price = p.price_range.min !== undefined ? `$${p.price_range.min}` : '';
-                    if (p.price_range.max && p.price_range.max !== p.price_range.min) price += ` – $${p.price_range.max}`;
-                    if (p.price_range.currency) price += ` ${p.price_range.currency}`;
+                    const minP = formatPrice(p.price_range.min);
+                    const maxP = formatPrice(p.price_range.max);
+                    const cur = p.price_range.currency || (p.price_range.min && p.price_range.min.currency) || '';
+                    price = minP;
+                    if (maxP && maxP !== minP) price += ` – ${maxP}`;
+                    if (cur) price += ` ${cur}`;
                 } else if (p.price) {
                     price = typeof p.price === 'object' ? `${p.price.amount} ${p.price.currencyCode || ''}` : String(p.price);
                 }
