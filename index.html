@@ -147,11 +147,23 @@
             Kyle Risley
             <div class="color-picker-wrap">
                 <div class="color-wheel"></div>
-                <input type="color" value="#1a1a1a" oninput="document.querySelector('h1').style.color = this.value" aria-label="Change name color">
+                <input type="color" id="name-color" value="#1a1a1a" oninput="document.querySelector('h1').style.color = this.value" aria-label="Change name color">
             </div>
         </div>
     </h1>
     <p class="tagline">Sr. SEO Lead, SERP Farmer, and Digital Custodian at Shopify</p>
+    <script>
+    (function() {
+        var colors = [
+            '#1a1a1a', '#5046e5', '#0369a1', '#0e7490', '#047857',
+            '#15803d', '#4338ca', '#7c3aed', '#9333ea', '#be185d',
+            '#b91c1c', '#c2410c', '#a16207', '#1d4ed8', '#6d28d9'
+        ];
+        var c = colors[Math.floor(Math.random() * colors.length)];
+        document.querySelector('h1').style.color = c;
+        document.getElementById('name-color').value = c;
+    })();
+    </script>
 
     <hr>
 
