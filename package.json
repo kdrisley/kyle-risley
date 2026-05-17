@@ -1,0 +1,13 @@
+{
+  "name": "kyle-risley-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "kylerisley.com — personal site and tools",
+  "scripts": {
+    "test": "node --test \"tools/ucp-explorer/**/*.test.js\"",
+    "lint": "eslint tools/ucp-explorer/"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0"
+  }
+}
