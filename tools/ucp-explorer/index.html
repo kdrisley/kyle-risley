@@ -660,6 +660,16 @@
                 width: 100%;
             }
 
+            .filter-row {
+                flex-wrap: wrap;
+            }
+
+            .filter-row input {
+                flex: 1;
+                min-width: 0;
+                width: auto;
+            }
+
             .interact-tab {
                 font-size: 13px;
                 padding: 8px 12px;
@@ -813,6 +823,37 @@
 
         .query-row button:active {
             transform: scale(0.97);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .filter-row input {
+            width: 130px;
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .filter-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(80, 70, 229, 0.1);
+        }
+
+        .filter-row input::placeholder {
+            color: #9ca3af;
+        }
+
+        .filter-hint {
+            font-size: 13px;
+            color: var(--text-tertiary);
         }
 
         .results-area {

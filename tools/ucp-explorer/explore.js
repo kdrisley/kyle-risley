@@ -434,6 +434,11 @@ function showInteractiveSection(tools) {
                     <input type="text" id="search-input" placeholder="e.g. hot sauce, gift sets, seasonings...">
                     <button onclick="searchCatalog()">Search</button>
                 </div>
+                <div class="filter-row">
+                    <input type="number" id="price-min" min="0" step="0.01" placeholder="Min price">
+                    <input type="number" id="price-max" min="0" step="0.01" placeholder="Max price">
+                    <span class="filter-hint" id="price-hint">Optional price range</span>
+                </div>
                 <div class="results-area" id="catalog-results"></div>
             </div>
         `;
@@ -461,8 +466,10 @@ function showInteractiveSection(tools) {
     section.innerHTML = tabsHtml + panelsHtml + jsonPaneHtml;
     log.appendChild(section);
 
-    document.getElementById('search-input')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') searchCatalog();
+    ['search-input', 'price-min', 'price-max'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchCatalog();
+        });
     });
     document.getElementById('policy-input')?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') searchPolicies();
@@ -564,12 +571,28 @@ async function searchCatalog() {
     const results = document.getElementById('catalog-results');
     results.innerHTML = '<span class="loading-dot">Searching...</span>';
 
-    const reqBody = buildMcpRequest('search_catalog', { catalog: { query, pagination: { limit: 10 } } });
+    const catalog = { query, pagination: { limit: 10 } };
+    // filters.price amounts are ISO 4217 minor units (e.g. cents); the UI takes
+    // major units and assumes a 2-decimal currency, correct for USD/EUR/GBP/etc.
+    const priceFilter = {};
+    const minVal = parseFloat(document.getElementById('price-min')?.value);
+    const maxVal = parseFloat(document.getElementById('price-max')?.value);
+    if (!isNaN(minVal) && minVal >= 0) priceFilter.min = Math.round(minVal * 100);
+    if (!isNaN(maxVal) && maxVal >= 0) priceFilter.max = Math.round(maxVal * 100);
+    if (priceFilter.min !== undefined || priceFilter.max !== undefined) {
+        catalog.filters = { price: priceFilter };
+    }
+
+    const reqBody = buildMcpRequest('search_catalog', { catalog });
 
     try {
         const resp = await mcpCallWithBody(reqBody);
         const data = await resp.json();
         const products = extractProducts(data);
+
+        const cur = (products.find(p => p.currency) || {}).currency;
+        const priceHint = document.getElementById('price-hint');
+        if (priceHint) priceHint.textContent = cur ? `Price range in ${cur}` : 'Optional price range';
 
         updateJsonPane(data);
 
@@ -756,14 +779,17 @@ function extractProducts(data) {
             const imgUrl = typeof img === 'string' ? img : (img.url || img.src || '');
 
             let price = '';
+            let currency = '';
             if (p.price_range) {
                 const minP = formatPrice(p.price_range.min);
                 const maxP = formatPrice(p.price_range.max);
                 const cur = p.price_range.currency || (p.price_range.min && p.price_range.min.currency) || '';
+                currency = cur;
                 price = minP;
                 if (maxP && maxP !== minP) price += ` – ${maxP}`;
                 if (cur) price += ` ${cur}`;
             } else if (p.price) {
+                currency = (typeof p.price === 'object' && p.price.currencyCode) || '';
                 price = typeof p.price === 'object' ? `${p.price.amount} ${p.price.currencyCode || ''}` : String(p.price);
             }
 
@@ -771,6 +797,7 @@ function extractProducts(data) {
                 id: p.product_id || p.id || p.productId || '',
                 name: p.title || p.name || 'Unnamed product',
                 price: price,
+                currency: currency,
                 image: imgUrl,
                 variantCount: p.total_variants || p.variantCount || (p.variants && p.variants.length) || 0,
                 url: p.url || ''
