@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: "Courier New", Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100%;
+            padding: 24px;
+            gap: 18px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            padding-left: 10px;
+        }
+        #court {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 8 / 5;
+            border: 2px solid #fff;
+            background: #000;
+            touch-action: none;
+            cursor: none;
+        }
+        p.hint {
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #777;
+            text-align: center;
+            max-width: 800px;
+        }
+        p.hint a { color: #999; }
+    </style>
+</head>
+<body>
+    <h1>Pong</h1>
+    <canvas id="court" width="800" height="500"></canvas>
+    <p class="hint">Move your mouse or drag &mdash; or use the &uarr; &darr; arrow keys. First to 11 wins.</p>
+    <script src="pong.js"></script>
+</body>
+</html>

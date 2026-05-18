@@ -9,8 +9,8 @@
 
 module.exports = [
     {
-        // Browser code: the UCP Explorer runs in the page.
-        files: ['tools/ucp-explorer/explore.js'],
+        // Browser code: the UCP Explorer and the Pong game run in the page.
+        files: ['tools/ucp-explorer/explore.js', 'pong/pong.js'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'script',
@@ -20,6 +20,7 @@ module.exports = [
                 fetch: 'readonly',
                 navigator: 'readonly',
                 setTimeout: 'readonly',
+                requestAnimationFrame: 'readonly',
                 console: 'readonly'
             }
         },
@@ -29,8 +30,8 @@ module.exports = [
         }
     },
     {
-        // Node code: the test file.
-        files: ['tools/ucp-explorer/*.test.js'],
+        // Node code: the test files.
+        files: ['tools/ucp-explorer/*.test.js', 'pong/*.test.js'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'commonjs',
