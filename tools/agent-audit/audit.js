@@ -12,21 +12,25 @@ window.onloadTurnstileCallback = function () {
         setTimeout(window.onloadTurnstileCallback, 100);
         return;
     }
-    turnstileWidgetId = window.turnstile.render('#turnstile', {
-        sitekey: TURNSTILE_SITE_KEY,
-        callback: (token) => {
-            currentTurnstileToken = token;
-            updateAuditButtonState();
-        },
-        'error-callback': () => {
-            currentTurnstileToken = null;
-            updateAuditButtonState();
-        },
-        'expired-callback': () => {
-            currentTurnstileToken = null;
-            updateAuditButtonState();
-        },
-    });
+    try {
+        turnstileWidgetId = window.turnstile.render('#turnstile', {
+            sitekey: TURNSTILE_SITE_KEY,
+            callback: (token) => {
+                currentTurnstileToken = token;
+                updateAuditButtonState();
+            },
+            'error-callback': () => {
+                currentTurnstileToken = null;
+                updateAuditButtonState();
+            },
+            'expired-callback': () => {
+                currentTurnstileToken = null;
+                updateAuditButtonState();
+            },
+        });
+    } catch (e) {
+        turnstileWidgetId = null;
+    }
     updateAuditButtonState();
 };
 
@@ -53,6 +57,33 @@ document.addEventListener('DOMContentLoaded', () => {
     waitForTurnstile().then(() => {
         if (turnstileWidgetId === null) window.onloadTurnstileCallback();
     });
+
+    // After 7s, if the widget's iframe still isn't in the DOM, surface a
+    // reload hint. Common causes are bfcache restoration loading Turnstile
+    // twice, or browser extensions (1Password, etc.) overriding browser APIs
+    // that Turnstile depends on.
+    setTimeout(() => {
+        const container = document.getElementById('turnstile');
+        if (container && !container.querySelector('iframe')) {
+            const help = document.createElement('p');
+            help.style.cssText = 'font-size:13px;color:var(--text-tertiary);margin-top:10px;';
+            help.innerHTML = "Verification widget didn't load. <a href=\"javascript:location.reload()\" style=\"color:var(--accent-text);\">Reload the page</a> — browser extensions like password managers can sometimes interfere.";
+            container.appendChild(help);
+        }
+    }, 7000);
+});
+
+// Re-render the widget if the page comes back from bfcache — the old widget
+// state is stale and can't mint new tokens.
+window.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    if (window.turnstile && turnstileWidgetId !== null) {
+        try { window.turnstile.remove(turnstileWidgetId); } catch { /* ignore */ }
+    }
+    turnstileWidgetId = null;
+    currentTurnstileToken = null;
+    updateAuditButtonState();
+    window.onloadTurnstileCallback();
 });
 
 function waitForTurnstile() {
