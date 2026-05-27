@@ -97,14 +97,21 @@ function waitForTurnstile() {
     });
 }
 
+// Reads the token and clears the local copy, but doesn't reset the widget
+// yet — we want to delay the widget's re-render until after results have
+// landed and the user has seen them. The widget reset happens in
+// resetTurnstileWidget(), called from the finally block of runUrlAudit.
 function consumeTurnstileToken() {
     const token = currentTurnstileToken;
     currentTurnstileToken = null;
+    return token;
+}
+
+function resetTurnstileWidget() {
     if (window.turnstile && turnstileWidgetId !== null) {
-        window.turnstile.reset(turnstileWidgetId);
+        try { window.turnstile.reset(turnstileWidgetId); } catch { /* ignore */ }
     }
     updateAuditButtonState();
-    return token;
 }
 
 function setupBookmarklet() {
@@ -145,8 +152,16 @@ async function runUrlAudit() {
         results.innerHTML = `<div class="error-banner">${esc(err.message)}. If the site blocks bots or renders content with JavaScript, try the bookmarklet — it works on any page you can load in your browser.</div>`;
     } finally {
         btn.textContent = 'Audit';
-        updateAuditButtonState();
+        revealResults(results);
+        resetTurnstileWidget();
     }
+}
+
+function revealResults(results) {
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Focus moves keyboard users (and screen-reader users via aria-live) to
+    // the freshly-rendered results, making it obvious the audit completed.
+    results.focus({ preventScroll: true });
 }
 
 async function fetchPageHtml(url, token) {

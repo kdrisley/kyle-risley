@@ -209,6 +209,12 @@
             animation: fadeIn 0.3s ease-out;
         }
 
+        .results:focus { outline: none; }
+        .results:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -488,7 +494,7 @@
         <p class="bookmarklet-hint">Drag this button up to your bookmarks bar &uarr;</p>
     </div>
 
-    <div class="results" id="results"></div>
+    <div class="results" id="results" role="status" aria-live="polite" tabindex="-1"></div>
 
     <section class="checks-reference">
         <h2>What gets checked</h2>
