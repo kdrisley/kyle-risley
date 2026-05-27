@@ -58,19 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (turnstileWidgetId === null) window.onloadTurnstileCallback();
     });
 
-    // After 7s, if the widget's iframe still isn't in the DOM, surface a
-    // reload hint. Common causes are bfcache restoration loading Turnstile
-    // twice, or browser extensions (1Password, etc.) overriding browser APIs
-    // that Turnstile depends on.
+    // After 15s without a token, surface a reload hint. Catches both
+    // "widget never rendered" and "widget rendered but stuck" — the latter
+    // happens when extensions like 1Password override navigator.credentials,
+    // breaking Cloudflare's Private Access Token flow.
     setTimeout(() => {
+        if (currentTurnstileToken) return;
         const container = document.getElementById('turnstile');
-        if (container && !container.querySelector('iframe')) {
-            const help = document.createElement('p');
-            help.style.cssText = 'font-size:13px;color:var(--text-tertiary);margin-top:10px;';
-            help.innerHTML = "Verification widget didn't load. <a href=\"javascript:location.reload()\" style=\"color:var(--accent-text);\">Reload the page</a> — browser extensions like password managers can sometimes interfere.";
-            container.appendChild(help);
-        }
-    }, 7000);
+        if (!container || container.querySelector('.turnstile-help')) return;
+        const help = document.createElement('div');
+        help.className = 'turnstile-help';
+        help.style.cssText = 'font-size:13px;color:var(--amber);background:var(--amber-bg);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.5;';
+        help.innerHTML = "Verification didn't complete. <a href=\"javascript:location.reload()\" style=\"color:var(--amber);text-decoration:underline;font-weight:600;\">Reload the page</a> and try again. If that doesn't help, a browser extension (often a password manager) is likely overriding browser APIs that Cloudflare's verification depends on — try disabling extensions for this site.";
+        container.appendChild(help);
+    }, 15000);
 });
 
 // Re-render the widget if the page comes back from bfcache — the old widget
