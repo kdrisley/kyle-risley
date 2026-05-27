@@ -5,7 +5,9 @@
 (function() {
     'use strict';
 
-    const SEMANTIC_INTERACTIVE_TAGS = new Set(['a', 'button', 'input', 'select', 'textarea', 'summary', 'details', 'label']);
+    // <details> is intentionally excluded: it's a container; the actual click
+    // target is the <summary> inside it, which is in this set on its own.
+    const SEMANTIC_INTERACTIVE_TAGS = new Set(['a', 'button', 'input', 'select', 'textarea', 'summary', 'label']);
     const INTERACTIVE_ROLES = new Set(['button', 'link', 'checkbox', 'radio', 'switch', 'tab', 'menuitem', 'option', 'combobox', 'searchbox', 'slider', 'spinbutton', 'textbox']);
 
     function isSemanticInteractive(el) {
@@ -164,30 +166,35 @@
         }
     }
 
-    // 4. cursor: pointer on actionable elements
+    // 4. cursor: pointer (or another deliberate cursor) on actionable elements
     {
         const targets = allInteractive().filter(el => !isVisuallyHidden(el).hidden);
         if (targets.length === 0) {
-            addCheck('cursor: pointer on actionable elements', 'skip', 'No visible interactive elements.');
+            addCheck('Deliberate cursor on actionable elements', 'skip', 'No visible interactive elements.');
         } else {
             const offenders = targets.filter(el => {
                 const tag = el.tagName.toLowerCase();
-                // Native form inputs typically use text/default cursors — exclude them
+                // Native text-entry inputs use the text cursor — that's correct.
                 if (tag === 'input') {
                     const t = (el.getAttribute('type') || 'text').toLowerCase();
                     if (['text', 'email', 'password', 'search', 'url', 'tel', 'number', 'date', 'datetime-local', 'month', 'time', 'week'].includes(t)) return false;
                 }
                 if (tag === 'textarea' || tag === 'select') return false;
+                // Disabled controls should show cursor: not-allowed, not pointer.
+                if (el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true') return false;
+                // Accept any deliberate non-default cursor (grab, move, zoom-in,
+                // crosshair, not-allowed, etc.) as a conscious developer choice.
+                // Only the inherited defaults are flagged.
                 const cursor = getComputedStyle(el).cursor;
-                return cursor !== 'pointer';
+                return cursor === 'auto' || cursor === 'default';
             });
             if (offenders.length === 0) {
-                addCheck('cursor: pointer on actionable elements', 'pass', `All ${targets.length} clickable element(s) have cursor: pointer.`);
+                addCheck('Deliberate cursor on actionable elements', 'pass', `All ${targets.length} clickable element(s) have a deliberate cursor (pointer or another non-default).`);
             } else {
                 addCheck(
-                    'cursor: pointer on actionable elements',
+                    'Deliberate cursor on actionable elements',
                     'warn',
-                    `${offenders.length} clickable element(s) do not use cursor: pointer.`,
+                    `${offenders.length} clickable element(s) use the inherited default cursor.`,
                     offenders.slice(0, 8).map(el => `cursor: ${getComputedStyle(el).cursor}\n${snippet(el)}`)
                 );
             }
@@ -222,14 +229,23 @@
 
     // 6. No ghost interactive elements
     {
-        // Elements that are clickable/focusable but visually invisible (opacity:0 or hidden) while still in the layout
         const all = allInteractive();
         const ghosts = all.map(el => {
             const cs = getComputedStyle(el);
-            if (cs.display === 'none') return null; // not a ghost — properly hidden
+            if (cs.display === 'none') return null;
             const rect = el.getBoundingClientRect();
-            if (rect.width === 0 && rect.height === 0) return null; // collapsed, won't intercept clicks
-            if (parseFloat(cs.opacity) === 0) return { el, reason: 'opacity:0 but still occupies space' };
+            if (rect.width === 0 && rect.height === 0) return null;
+            // Styled-input pattern: native input hidden by opacity:0 with a styled
+            // overlay on top. The aria-label signals it's intentional + accessible,
+            // so we don't flag it as a ghost. Without aria-label this would be the
+            // dangerous "invisible button on top of content" anti-pattern.
+            const hasAccessibleName =
+                (el.getAttribute('aria-label') || '').trim() ||
+                (el.getAttribute('aria-labelledby') || '').trim();
+            if (parseFloat(cs.opacity) === 0) {
+                if (hasAccessibleName) return null;
+                return { el, reason: 'opacity:0 but still occupies space (no aria-label)' };
+            }
             if (cs.visibility === 'hidden') return { el, reason: 'visibility:hidden but still in layout' };
             return null;
         }).filter(Boolean);

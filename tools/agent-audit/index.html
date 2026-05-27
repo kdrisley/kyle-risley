@@ -509,8 +509,8 @@
         </details>
 
         <details class="faq-item">
-            <summary><code>cursor: pointer</code> on actionable elements <em>(bookmarklet only)</em></summary>
-            <p>The pointer cursor is a strong signal that an element is clickable. Vision-based agents pick up on it. This check requires computed styles, so it only runs in the bookmarklet.</p>
+            <summary>Deliberate cursor on actionable elements <em>(bookmarklet only)</em></summary>
+            <p>A non-default cursor is a strong signal that an element is interactive. Vision-based agents pick up on it. We pass any element that uses a deliberate cursor — <code>pointer</code>, <code>grab</code>, <code>move</code>, <code>zoom-in</code>, etc. — and only flag elements still using the inherited <code>auto</code>/<code>default</code>. Known exceptions we silently skip: <code>disabled</code> buttons (which correctly use <code>not-allowed</code>), native text inputs (<code>cursor: text</code> is right for them), and <code>&lt;details&gt;</code> containers (the click target is the <code>&lt;summary&gt;</code> inside, which is checked separately). Requires computed styles, so bookmarklet only.</p>
         </details>
 
         <details class="faq-item">
@@ -520,7 +520,7 @@
 
         <details class="faq-item">
             <summary>No "ghost" interactive elements <em>(bookmarklet only)</em></summary>
-            <p>Transparent overlays, <code>opacity: 0</code> covers, or elements hidden by CSS but still tab-focusable confuse agents that mix screenshots with the DOM. This check looks at computed visibility/opacity and rendered bounds, so it only runs in the bookmarklet.</p>
+            <p>Transparent overlays or <code>opacity: 0</code> covers that still capture clicks confuse vision-based agents — they see one thing and click another. We flag elements with computed <code>opacity: 0</code> or <code>visibility: hidden</code> that still take up layout space. Known exception we silently skip: the styled-input pattern, where a native control (e.g. <code>&lt;input type="color"&gt;</code>, file picker, checkbox) is hidden with <code>opacity: 0</code> and overlaid by a styled element. We detect this by the presence of an <code>aria-label</code> or <code>aria-labelledby</code> — that's the signal the developer made the input invisible on purpose, with accessibility intact.</p>
         </details>
     </section>
 
