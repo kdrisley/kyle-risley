@@ -75,7 +75,8 @@ function isPrivateOrBlockedHost(hostname) {
 }
 
 async function verifyTurnstile(token, ip, secret) {
-    if (!token || !secret) return false;
+    if (!token) return { ok: false, errors: ['missing-token'] };
+    if (!secret) return { ok: false, errors: ['missing-secret-binding'] };
     const body = new FormData();
     body.append('secret', secret);
     body.append('response', token);
@@ -86,9 +87,10 @@ async function verifyTurnstile(token, ip, secret) {
             body,
         });
         const data = await resp.json();
-        return data.success === true;
+        if (data.success === true) return { ok: true };
+        return { ok: false, errors: data['error-codes'] || ['unknown'] };
     } catch (e) {
-        return false;
+        return { ok: false, errors: ['fetch-failed: ' + (e.message || 'unknown')] };
     }
 }
 
@@ -116,9 +118,12 @@ async function handleProxy(request, env) {
     }
 
     const ip = request.headers.get('CF-Connecting-IP') || '';
-    const verified = await verifyTurnstile(token, ip, env.TURNSTILE_SECRET);
-    if (!verified) {
-        return json({ error: 'Turnstile verification failed' }, 403);
+    const verification = await verifyTurnstile(token, ip, env.TURNSTILE_SECRET);
+    if (!verification.ok) {
+        return json({
+            error: 'Turnstile verification failed',
+            errorCodes: verification.errors,
+        }, 403);
     }
 
     const controller = new AbortController();

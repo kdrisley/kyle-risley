@@ -8,6 +8,10 @@ let currentTurnstileToken = null;
 
 window.onloadTurnstileCallback = function () {
     if (turnstileWidgetId !== null) return;
+    if (!window.turnstile || typeof window.turnstile.render !== 'function') {
+        setTimeout(window.onloadTurnstileCallback, 100);
+        return;
+    }
     turnstileWidgetId = window.turnstile.render('#turnstile', {
         sitekey: TURNSTILE_SITE_KEY,
         callback: (token) => {
@@ -120,7 +124,12 @@ async function fetchPageHtml(url, token) {
         let detail = '';
         try {
             const body = await resp.json();
-            detail = body && body.error ? `: ${body.error}` : '';
+            if (body && body.error) {
+                detail = `: ${body.error}`;
+                if (body.errorCodes && body.errorCodes.length) {
+                    detail += ` [${body.errorCodes.join(', ')}]`;
+                }
+            }
         } catch { /* ignore */ }
         throw new Error(`Couldn't fetch the page (HTTP ${resp.status}${detail})`);
     }
