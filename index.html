@@ -76,6 +76,9 @@
             text-decoration: none;
             transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
         }
+        .tool-link + .tool-link {
+            margin-top: 10px;
+        }
         .tool-link:hover {
             border-color: var(--accent);
             box-shadow: 0 2px 8px rgba(80, 70, 229, 0.08);
@@ -182,6 +185,10 @@
         <a href="/tools/ucp-explorer/" class="tool-link">
             <div class="tool-title">UCP Explorer</div>
             <div class="tool-desc">See how AI agents discover and interact with a store's commerce endpoints.</div>
+        </a>
+        <a href="/tools/agent-audit/" class="tool-link">
+            <div class="tool-title">Agent Audit</div>
+            <div class="tool-desc">Check your site against Google's AI-agent UX checklist — by URL or with a bookmarklet.</div>
         </a>
     </div>
 

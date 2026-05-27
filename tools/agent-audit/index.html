@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Audit — Check Your Site Against Google's AI Agent UX Checklist</title>
+    <meta name="description" content="Audit your site against Google's web.dev recommendations for AI-agent-friendly UX. Run a quick static check on any URL or use the bookmarklet for a full in-browser audit.">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --accent: #5046e5;
+            --accent-light: #ededfd;
+            --accent-text: #3f37c9;
+            --green: #16a34a;
+            --green-bg: #ecfdf5;
+            --amber: #d97706;
+            --amber-bg: #fffbeb;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --text: #1a1a1a;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --surface: #f9fafb;
+            --bg: #ffffff;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .page-header {
+            max-width: 720px;
+            padding-top: 48px;
+            padding-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: var(--text-tertiary);
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .back-link {
+            display: inline-block;
+            font-size: 14px;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            margin-bottom: 24px;
+            transition: color 0.15s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-text);
+        }
+
+        .intro {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+        }
+
+        .intro a {
+            color: var(--accent-text);
+            text-decoration: underline;
+            text-decoration-color: #c7c5f2;
+            text-underline-offset: 2px;
+        }
+
+        .intro code {
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
+            font-size: 13px;
+            background: var(--accent-light);
+            color: var(--accent-text);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .mode-section {
+            max-width: 720px;
+            margin-bottom: 32px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+        }
+
+        .mode-section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+
+        .mode-section .mode-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-row input {
+            flex: 1;
+            font-size: 16px;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: var(--bg);
+        }
+
+        .input-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(80, 70, 229, 0.1);
+        }
+
+        .input-row input::placeholder {
+            color: #9ca3af;
+        }
+
+        .input-row button {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .input-row button:hover {
+            background: #4338ca;
+        }
+
+        .input-row button:active {
+            transform: scale(0.97);
+        }
+
+        .input-row button:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .bookmarklet-link {
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 18px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: grab;
+            transition: background 0.15s;
+        }
+
+        .bookmarklet-link:hover {
+            background: #4338ca;
+        }
+
+        .bookmarklet-link:active {
+            cursor: grabbing;
+        }
+
+        .bookmarklet-hint {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 10px;
+        }
+
+        .results {
+            max-width: 720px;
+            margin-top: 24px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            padding: 20px 24px;
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+
+        .results-target {
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            word-break: break-all;
+        }
+
+        .results-summary {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .pill-pass {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .pill-warn {
+            background: var(--amber-bg);
+            color: var(--amber);
+        }
+
+        .pill-fail {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .check {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .check:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            font-size: 14px;
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            text-align: center;
+            line-height: 22px;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        .check-icon.pass { background: var(--green-bg); color: var(--green); }
+        .check-icon.warn { background: var(--amber-bg); color: var(--amber); }
+        .check-icon.fail { background: var(--red-bg); color: var(--red); }
+        .check-icon.skip { background: var(--border-light); color: var(--text-tertiary); }
+
+        .check-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .check-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .check-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+
+        .check-samples {
+            margin-top: 8px;
+        }
+
+        .check-samples summary {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.15s;
+        }
+
+        .check-samples summary:hover {
+            color: var(--accent-text);
+        }
+
+        .check-samples pre {
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .error-banner {
+            font-size: 14px;
+            padding: 12px 14px;
+            background: var(--red-bg);
+            color: var(--red);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .checks-reference {
+            max-width: 720px;
+            margin-top: 48px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            padding-bottom: 60px;
+        }
+
+        .checks-reference h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 20px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-light);
+            padding: 14px 0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-item summary {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            list-style: none;
+            transition: color 0.15s;
+        }
+
+        .faq-item summary:hover {
+            color: var(--accent-text);
+        }
+
+        .faq-item summary::before {
+            content: '+ ';
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .faq-item[open] summary::before {
+            content: '- ';
+            color: var(--accent-text);
+        }
+
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq-item p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            padding-left: 18px;
+        }
+
+        .faq-item code {
+            font-family: "SF Mono", "Fira Code", Menlo, monospace;
+            font-size: 13px;
+            background: var(--accent-light);
+            color: var(--accent-text);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .faq-item a {
+            color: var(--accent-text);
+            text-decoration: underline;
+            text-decoration-color: #c7c5f2;
+            text-underline-offset: 2px;
+        }
+
+        .disclaimer {
+            max-width: 720px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            padding-bottom: 48px;
+        }
+    </style>
+</head>
+<body>
+    <main>
+    <div class="page-header">
+        <a href="/" class="back-link">&larr; kylerisley.com</a>
+        <h1>Agent Audit</h1>
+        <p class="subtitle">Check your site against Google's AI-agent UX checklist</p>
+
+        <div class="intro">
+            <p>This tool checks a page against the recommendations in Google's <a href="https://web.dev/articles/ai-agent-site-ux" target="_blank" rel="noopener">Build agent-friendly websites</a> article. The same things that help screen readers also help AI agents understand and use your site: semantic HTML, linked labels, real interactive elements with the right size and roles.</p>
+            <p style="margin-top:12px;">Two ways to run it:</p>
+        </div>
+    </div>
+
+    <div class="mode-section">
+        <h2>Quick audit by URL</h2>
+        <p class="mode-desc">Fetches the page's HTML and runs static checks. Fast, but can't measure rendered styles or element sizes.</p>
+        <div class="input-row">
+            <input type="text" id="url-input" placeholder="https://example.com" autocomplete="off">
+            <button id="audit-btn" onclick="runUrlAudit()">Audit</button>
+        </div>
+        <div id="turnstile" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="mode-section">
+        <h2>Full audit via bookmarklet</h2>
+        <p class="mode-desc">Drag the button below to your bookmarks bar, then click it while on any page to run the full audit (computed styles, rendered sizes, accessibility tree) in an overlay.</p>
+        <a id="bookmarklet" class="bookmarklet-link" href="#">Agent Audit</a>
+        <p class="bookmarklet-hint">Drag this button up to your bookmarks bar &uarr;</p>
+    </div>
+
+    <div class="results" id="results"></div>
+
+    <section class="checks-reference">
+        <h2>What gets checked</h2>
+
+        <details class="faq-item">
+            <summary>Semantic HTML for interactive elements</summary>
+            <p>Agents — and assistive tech — understand <code>&lt;button&gt;</code> and <code>&lt;a&gt;</code> natively. A <code>&lt;div onclick="..."&gt;</code> is invisible to the accessibility tree unless you add <code>role</code> and <code>tabindex</code>, and even then it's a worse signal than the real element. This check flags non-semantic elements that look interactive (have <code>onclick</code>, <code>role="button"</code>, etc.).</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Labels linked to inputs</summary>
+            <p>Every form control should have an associated <code>&lt;label&gt;</code> — either via <code>for="input-id"</code>, by wrapping the input, or via <code>aria-label</code>/<code>aria-labelledby</code>. Without this link, agents and screen readers don't know what a field is for.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Custom interactive elements have <code>role</code> and <code>tabindex</code></summary>
+            <p>If you must use a <code>&lt;div&gt;</code> or <code>&lt;span&gt;</code> as a button, it needs <code>role="button"</code> (or appropriate role) and <code>tabindex="0"</code> so it lands in the accessibility tree and keyboard focus order.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary><code>cursor: pointer</code> on actionable elements <em>(bookmarklet only)</em></summary>
+            <p>The pointer cursor is a strong signal that an element is clickable. Vision-based agents pick up on it. This check requires computed styles, so it only runs in the bookmarklet.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Interactive elements ≥ 8 square pixels <em>(bookmarklet only)</em></summary>
+            <p>Tiny or zero-size interactive elements are a hint that something is broken or hidden. The web.dev guidance: keep visible area larger than 8 px². Requires layout measurements, so bookmarklet only.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>No "ghost" interactive elements <em>(bookmarklet only)</em></summary>
+            <p>Transparent overlays, <code>opacity: 0</code> covers, or elements hidden by CSS but still tab-focusable confuse agents that mix screenshots with the DOM. This check looks at computed visibility/opacity and rendered bounds, so it only runs in the bookmarklet.</p>
+        </details>
+    </section>
+
+    <p class="disclaimer">This tool is an independent project. It is not affiliated with, endorsed by, or associated with Google or web.dev. The URL-audit mode fetches HTML through a Cloudflare Worker on this site; the bookmarklet runs entirely in your browser and sends no data anywhere.</p>
+    </main>
+
+    <script src="audit.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+// Agent Audit — URL-mode static checks + bookmarklet wiring
+
+// CONFIG: replace TURNSTILE_SITE_KEY with the site key from your Cloudflare
+// Turnstile dashboard after creating the widget for kylerisley.com.
+const TURNSTILE_SITE_KEY = 'REPLACE_WITH_TURNSTILE_SITE_KEY';
+const PROXY_URL = 'https://agent-audit-proxy.kylerisley.com/proxy';
+
+let turnstileWidgetId = null;
+let turnstileReady = false;
+
+window.onloadTurnstileCallback = function () {
+    turnstileWidgetId = window.turnstile.render('#turnstile', {
+        sitekey: TURNSTILE_SITE_KEY,
+        size: 'invisible',
+        appearance: 'execute',
+    });
+    turnstileReady = true;
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupBookmarklet();
+    const input = document.getElementById('url-input');
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') runUrlAudit();
+    });
+
+    waitForTurnstile().then(() => {
+        if (!turnstileReady) window.onloadTurnstileCallback();
+    });
+});
+
+function waitForTurnstile() {
+    return new Promise((resolve) => {
+        const check = () => {
+            if (window.turnstile) resolve();
+            else setTimeout(check, 100);
+        };
+        check();
+    });
+}
+
+function getTurnstileToken() {
+    return new Promise((resolve, reject) => {
+        if (!window.turnstile || turnstileWidgetId === null) {
+            reject(new Error('Turnstile not initialised'));
+            return;
+        }
+        let resolved = false;
+        const onSuccess = (token) => {
+            if (resolved) return;
+            resolved = true;
+            resolve(token);
+        };
+        const onError = (err) => {
+            if (resolved) return;
+            resolved = true;
+            reject(new Error('Turnstile challenge failed' + (err ? `: ${err}` : '')));
+        };
+        // Re-render with per-request callbacks so we can await the token.
+        window.turnstile.remove(turnstileWidgetId);
+        turnstileWidgetId = window.turnstile.render('#turnstile', {
+            sitekey: TURNSTILE_SITE_KEY,
+            size: 'invisible',
+            appearance: 'execute',
+            callback: onSuccess,
+            'error-callback': onError,
+            'timeout-callback': () => onError('timeout'),
+        });
+        window.turnstile.execute(turnstileWidgetId);
+        setTimeout(() => onError('global timeout'), 30000);
+    });
+}
+
+function setupBookmarklet() {
+    const origin = window.location.origin;
+    const path = window.location.pathname.replace(/index\.html$/, '');
+    const scriptUrl = origin + path + 'bookmarklet.js';
+    const code = "(function(){if(window.__agentAuditPanel){window.__agentAuditPanel.remove();window.__agentAuditPanel=null;return;}var s=document.createElement('script');s.src='" + scriptUrl + "?'+Date.now();s.onerror=function(){alert('Agent Audit: failed to load script.')};document.body.appendChild(s);})();";
+    document.getElementById('bookmarklet').href = 'javascript:' + encodeURIComponent(code);
+}
+
+async function runUrlAudit() {
+    const input = document.getElementById('url-input');
+    const btn = document.getElementById('audit-btn');
+    const results = document.getElementById('results');
+
+    let url = input.value.trim();
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+    results.classList.add('active');
+    results.innerHTML = '<p style="color:var(--text-tertiary);font-size:14px;padding:8px 0;">Verifying you\'re human…</p>';
+
+    try {
+        const token = await getTurnstileToken();
+        btn.textContent = 'Auditing…';
+        results.innerHTML = '<p style="color:var(--text-tertiary);font-size:14px;padding:8px 0;">Fetching page…</p>';
+        const html = await fetchPageHtml(url, token);
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const bodyChildren = doc.body ? doc.body.children.length : 0;
+        const checks = runStaticChecks(doc);
+        renderResults(results, url, checks, bodyChildren);
+    } catch (err) {
+        results.innerHTML = `<div class="error-banner">${esc(err.message)}. If the site blocks bots or renders content with JavaScript, try the bookmarklet — it works on any page you can load in your browser.</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Audit';
+    }
+}
+
+async function fetchPageHtml(url, token) {
+    const proxyUrl = `${PROXY_URL}?url=${encodeURIComponent(url)}&token=${encodeURIComponent(token)}`;
+    const resp = await fetch(proxyUrl);
+    if (!resp.ok) {
+        let detail = '';
+        try {
+            const body = await resp.json();
+            detail = body && body.error ? `: ${body.error}` : '';
+        } catch { /* ignore */ }
+        throw new Error(`Couldn't fetch the page (HTTP ${resp.status}${detail})`);
+    }
+    return await resp.text();
+}
+
+const STATIC_CHECKS = [
+    {
+        id: 'semantic-html',
+        title: 'Semantic HTML for interactive elements',
+        run: (doc) => {
+            const offenders = [];
+            doc.querySelectorAll('[onclick]').forEach(el => {
+                const tag = el.tagName.toLowerCase();
+                if (!['a', 'button', 'input', 'select', 'textarea', 'summary', 'details', 'label'].includes(tag)) {
+                    offenders.push(el);
+                }
+            });
+            if (offenders.length === 0) {
+                return { status: 'pass', detail: 'No non-semantic elements with inline onclick handlers in the HTML.' };
+            }
+            return {
+                status: 'warn',
+                detail: `${offenders.length} non-semantic element(s) carry onclick handlers. Prefer <button> or <a>.`,
+                samples: offenders.slice(0, 5).map(el => trim(el.outerHTML, 240)),
+            };
+        }
+    },
+    {
+        id: 'label-for',
+        title: 'Form inputs have associated labels',
+        run: (doc) => {
+            const skippedTypes = ['hidden', 'submit', 'button', 'reset', 'image'];
+            const inputs = [...doc.querySelectorAll('input, select, textarea')].filter(el => {
+                if (el.tagName.toLowerCase() !== 'input') return true;
+                return !skippedTypes.includes((el.getAttribute('type') || 'text').toLowerCase());
+            });
+            if (inputs.length === 0) {
+                return { status: 'skip', detail: 'No labelable form inputs on this page.' };
+            }
+            const unlabeled = inputs.filter(el => !hasLabel(el, doc));
+            if (unlabeled.length === 0) {
+                return { status: 'pass', detail: `All ${inputs.length} form input(s) have a label, aria-label, or aria-labelledby.` };
+            }
+            return {
+                status: 'fail',
+                detail: `${unlabeled.length} of ${inputs.length} form input(s) have no associated label.`,
+                samples: unlabeled.slice(0, 5).map(el => trim(el.outerHTML, 240)),
+            };
+        }
+    },
+    {
+        id: 'custom-interactive-roles',
+        title: 'Custom interactive elements have role + tabindex',
+        run: (doc) => {
+            const candidates = [];
+            doc.querySelectorAll('[onclick]').forEach(el => {
+                const tag = el.tagName.toLowerCase();
+                if (!['a', 'button', 'input', 'select', 'textarea', 'summary', 'details', 'label'].includes(tag)) {
+                    candidates.push(el);
+                }
+            });
+            if (candidates.length === 0) {
+                return { status: 'skip', detail: 'No custom (non-semantic) interactive elements found in the static HTML.' };
+            }
+            const offenders = candidates.map(el => {
+                const missing = [];
+                if (!el.hasAttribute('role')) missing.push('role');
+                if (!el.hasAttribute('tabindex')) missing.push('tabindex');
+                return { el, missing };
+            }).filter(o => o.missing.length > 0);
+            if (offenders.length === 0) {
+                return { status: 'pass', detail: `All ${candidates.length} custom interactive element(s) have role + tabindex.` };
+            }
+            return {
+                status: 'fail',
+                detail: `${offenders.length} of ${candidates.length} custom interactive element(s) missing ARIA attributes.`,
+                samples: offenders.slice(0, 5).map(o => `Missing ${o.missing.join(' + ')}:\n${trim(o.el.outerHTML, 200)}`),
+            };
+        }
+    },
+    {
+        id: 'inline-hidden-interactive',
+        title: 'No interactive elements hidden via inline styles',
+        run: (doc) => {
+            const interactive = doc.querySelectorAll('a, button, input, select, textarea, [role="button"], [role="link"], [onclick]');
+            if (interactive.length === 0) {
+                return { status: 'skip', detail: 'No interactive elements found.' };
+            }
+            const hidden = [...interactive].filter(el => {
+                const s = (el.getAttribute('style') || '').toLowerCase();
+                return /display\s*:\s*none/.test(s) || /visibility\s*:\s*hidden/.test(s) || /opacity\s*:\s*0(?![\.\d])/.test(s);
+            });
+            if (hidden.length === 0) {
+                return { status: 'pass', detail: 'No interactive elements have inline display:none / visibility:hidden / opacity:0.' };
+            }
+            return {
+                status: 'warn',
+                detail: `${hidden.length} interactive element(s) are hidden inline but still in the DOM.`,
+                samples: hidden.slice(0, 5).map(el => trim(el.outerHTML, 240)),
+            };
+        }
+    },
+    {
+        id: 'lang-attr',
+        title: 'Document has a <html lang> attribute',
+        run: (doc) => {
+            const html = doc.documentElement;
+            const lang = html && html.getAttribute('lang');
+            if (lang && lang.trim()) {
+                return { status: 'pass', detail: `<html lang="${esc(lang)}"> is set.` };
+            }
+            return { status: 'warn', detail: 'Missing <html lang="…">. Helps agents (and screen readers) interpret content.' };
+        }
+    },
+    {
+        id: 'main-landmark',
+        title: 'Page has a <main> landmark',
+        run: (doc) => {
+            const mains = doc.querySelectorAll('main, [role="main"]');
+            if (mains.length === 1) {
+                return { status: 'pass', detail: 'Exactly one main landmark found.' };
+            }
+            if (mains.length === 0) {
+                return { status: 'warn', detail: 'No <main> element or role="main" found. Landmarks help agents skip nav/footer chrome.' };
+            }
+            return { status: 'warn', detail: `${mains.length} main landmarks found. Should be exactly one per page.` };
+        }
+    },
+];
+
+function hasLabel(el, doc) {
+    const ariaLabel = el.getAttribute('aria-label');
+    if (ariaLabel && ariaLabel.trim()) return true;
+    const ariaLabelledby = el.getAttribute('aria-labelledby');
+    if (ariaLabelledby) {
+        const ids = ariaLabelledby.split(/\s+/).filter(Boolean);
+        if (ids.some(id => doc.getElementById(id))) return true;
+    }
+    let parent = el.parentElement;
+    while (parent) {
+        if (parent.tagName && parent.tagName.toLowerCase() === 'label') return true;
+        parent = parent.parentElement;
+    }
+    const id = el.getAttribute('id');
+    if (id) {
+        const escaped = id.replace(/(["\\])/g, '\\$1');
+        if (doc.querySelector(`label[for="${escaped}"]`)) return true;
+    }
+    const title = el.getAttribute('title');
+    if (title && title.trim()) return true;
+    return false;
+}
+
+function runStaticChecks(doc) {
+    return STATIC_CHECKS.map(check => ({
+        id: check.id,
+        title: check.title,
+        result: check.run(doc),
+    }));
+}
+
+function renderResults(container, target, checks, bodyChildren) {
+    const counts = { pass: 0, warn: 0, fail: 0, skip: 0 };
+    checks.forEach(c => counts[c.result.status]++);
+
+    const pills = [];
+    if (counts.pass) pills.push(`<span class="pill pill-pass">${counts.pass} pass</span>`);
+    if (counts.warn) pills.push(`<span class="pill pill-warn">${counts.warn} warn</span>`);
+    if (counts.fail) pills.push(`<span class="pill pill-fail">${counts.fail} fail</span>`);
+
+    const sparseWarning = bodyChildren < 3
+        ? `<div class="error-banner" style="background:var(--amber-bg);color:var(--amber);">The fetched HTML has very few elements (${bodyChildren} body children). This page likely renders content with JavaScript, so the static audit can't see most of it. Use the bookmarklet instead.</div>`
+        : '';
+
+    container.innerHTML = `
+        <div class="results-header">
+            <div class="results-target">${esc(target)}</div>
+            <div class="results-summary">${pills.join('')}</div>
+        </div>
+        ${sparseWarning}
+        ${checks.map(renderCheck).join('')}
+        <p style="font-size:12px;color:var(--text-tertiary);margin-top:14px;">URL mode checks static HTML only. For computed cursor, rendered sizes, and ghost-element detection, use the bookmarklet.</p>
+    `;
+}
+
+function renderCheck(check) {
+    const { result } = check;
+    const iconChar = { pass: '✓', warn: '!', fail: '✗', skip: '–' }[result.status];
+    const samples = result.samples && result.samples.length
+        ? `<details class="check-samples"><summary>Show ${result.samples.length} sample${result.samples.length === 1 ? '' : 's'}</summary><pre>${result.samples.map(esc).join('\n\n')}</pre></details>`
+        : '';
+    return `
+        <div class="check">
+            <div class="check-icon ${result.status}">${iconChar}</div>
+            <div class="check-body">
+                <div class="check-title">${esc(check.title)}</div>
+                <div class="check-detail">${esc(result.detail)}</div>
+                ${samples}
+            </div>
+        </div>
+    `;
+}
+
+function trim(s, n) {
+    return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
+function esc(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}

@@ -1,0 +1,13 @@
+name = "agent-audit-proxy"
+main = "src/index.js"
+compatibility_date = "2026-01-15"
+workers_dev = false
+
+# Custom domain — Cloudflare will set up DNS automatically when you deploy.
+# kylerisley.com must already be a zone on this Cloudflare account.
+routes = [
+    { pattern = "agent-audit-proxy.kylerisley.com", custom_domain = true },
+]
+
+# Secrets (set via: wrangler secret put TURNSTILE_SECRET)
+#   TURNSTILE_SECRET — server-side Turnstile secret key from the dashboard
