@@ -1,74 +1,74 @@
 // Agent Audit — URL-mode static checks + bookmarklet wiring
 
-// CONFIG: replace TURNSTILE_SITE_KEY with the site key from your Cloudflare
-// Turnstile dashboard after creating the widget for kylerisley.com.
-const TURNSTILE_SITE_KEY = 'REPLACE_WITH_TURNSTILE_SITE_KEY';
+const TURNSTILE_SITE_KEY = '0x4AAAAAADXZibhBkOMDEGKN';
 const PROXY_URL = 'https://agent-audit-proxy.kylerisley.com/proxy';
 
 let turnstileWidgetId = null;
-let turnstileReady = false;
+let currentTurnstileToken = null;
 
 window.onloadTurnstileCallback = function () {
+    if (turnstileWidgetId !== null) return;
     turnstileWidgetId = window.turnstile.render('#turnstile', {
         sitekey: TURNSTILE_SITE_KEY,
-        size: 'invisible',
-        appearance: 'execute',
+        callback: (token) => {
+            currentTurnstileToken = token;
+            updateAuditButtonState();
+        },
+        'error-callback': () => {
+            currentTurnstileToken = null;
+            updateAuditButtonState();
+        },
+        'expired-callback': () => {
+            currentTurnstileToken = null;
+            updateAuditButtonState();
+        },
     });
-    turnstileReady = true;
+    updateAuditButtonState();
 };
+
+function updateAuditButtonState() {
+    const btn = document.getElementById('audit-btn');
+    if (!btn) return;
+    if (!currentTurnstileToken) {
+        btn.disabled = true;
+        btn.title = 'Complete the verification widget below to enable';
+    } else {
+        btn.disabled = false;
+        btn.title = '';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     setupBookmarklet();
+    updateAuditButtonState();
     const input = document.getElementById('url-input');
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') runUrlAudit();
     });
 
     waitForTurnstile().then(() => {
-        if (!turnstileReady) window.onloadTurnstileCallback();
+        if (turnstileWidgetId === null) window.onloadTurnstileCallback();
     });
 });
 
 function waitForTurnstile() {
     return new Promise((resolve) => {
         const check = () => {
-            if (window.turnstile) resolve();
+            if (window.turnstile && window.turnstile.render) resolve();
             else setTimeout(check, 100);
         };
         check();
     });
 }
 
-function getTurnstileToken() {
-    return new Promise((resolve, reject) => {
-        if (!window.turnstile || turnstileWidgetId === null) {
-            reject(new Error('Turnstile not initialised'));
-            return;
-        }
-        let resolved = false;
-        const onSuccess = (token) => {
-            if (resolved) return;
-            resolved = true;
-            resolve(token);
-        };
-        const onError = (err) => {
-            if (resolved) return;
-            resolved = true;
-            reject(new Error('Turnstile challenge failed' + (err ? `: ${err}` : '')));
-        };
-        // Re-render with per-request callbacks so we can await the token.
-        window.turnstile.remove(turnstileWidgetId);
-        turnstileWidgetId = window.turnstile.render('#turnstile', {
-            sitekey: TURNSTILE_SITE_KEY,
-            size: 'invisible',
-            appearance: 'execute',
-            callback: onSuccess,
-            'error-callback': onError,
-            'timeout-callback': () => onError('timeout'),
-        });
-        window.turnstile.execute(turnstileWidgetId);
-        setTimeout(() => onError('global timeout'), 30000);
-    });
+function consumeTurnstileToken() {
+    const token = currentTurnstileToken;
+    currentTurnstileToken = null;
+    if (window.turnstile && turnstileWidgetId !== null) {
+        window.turnstile.reset(turnstileWidgetId);
+    }
+    updateAuditButtonState();
+    return token;
 }
 
 function setupBookmarklet() {
@@ -88,15 +88,18 @@ async function runUrlAudit() {
     if (!url) return;
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
 
+    const token = consumeTurnstileToken();
+    if (!token) {
+        results.innerHTML = '<div class="error-banner">Please complete the verification widget first.</div>';
+        return;
+    }
+
     btn.disabled = true;
-    btn.textContent = 'Verifying…';
+    btn.textContent = 'Auditing…';
     results.classList.add('active');
-    results.innerHTML = '<p style="color:var(--text-tertiary);font-size:14px;padding:8px 0;">Verifying you\'re human…</p>';
+    results.innerHTML = '<p style="color:var(--text-tertiary);font-size:14px;padding:8px 0;">Fetching page…</p>';
 
     try {
-        const token = await getTurnstileToken();
-        btn.textContent = 'Auditing…';
-        results.innerHTML = '<p style="color:var(--text-tertiary);font-size:14px;padding:8px 0;">Fetching page…</p>';
         const html = await fetchPageHtml(url, token);
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const bodyChildren = doc.body ? doc.body.children.length : 0;
@@ -105,8 +108,8 @@ async function runUrlAudit() {
     } catch (err) {
         results.innerHTML = `<div class="error-banner">${esc(err.message)}. If the site blocks bots or renders content with JavaScript, try the bookmarklet — it works on any page you can load in your browser.</div>`;
     } finally {
-        btn.disabled = false;
         btn.textContent = 'Audit';
+        updateAuditButtonState();
     }
 }
 
