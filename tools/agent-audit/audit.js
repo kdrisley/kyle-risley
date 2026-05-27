@@ -308,12 +308,62 @@ function renderResults(container, target, checks, bodyChildren) {
     container.innerHTML = `
         <div class="results-header">
             <div class="results-target">${esc(target)}</div>
-            <div class="results-summary">${pills.join('')}</div>
+            <div class="results-summary">
+                ${pills.join('')}
+                <button type="button" class="copy-btn" id="copy-results-btn">Copy results</button>
+            </div>
         </div>
         ${sparseWarning}
         ${checks.map(renderCheck).join('')}
         <p style="font-size:12px;color:var(--text-tertiary);margin-top:14px;">URL mode checks static HTML only. For computed cursor, rendered sizes, and ghost-element detection, use the bookmarklet.</p>
     `;
+
+    const copyBtn = container.querySelector('#copy-results-btn');
+    copyBtn.addEventListener('click', () => {
+        const markdown = formatChecksAsMarkdown(target, checks, counts, 'URL audit (static HTML)');
+        navigator.clipboard.writeText(markdown).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy results';
+                copyBtn.classList.remove('copied');
+            }, 1800);
+        }).catch(() => {
+            copyBtn.textContent = 'Copy failed';
+            setTimeout(() => { copyBtn.textContent = 'Copy results'; }, 1800);
+        });
+    });
+}
+
+function formatChecksAsMarkdown(target, checks, counts, mode) {
+    const lines = [];
+    lines.push(`# Agent Audit — ${target}`);
+    lines.push('');
+    const summary = [];
+    if (counts.pass) summary.push(`${counts.pass} pass`);
+    if (counts.warn) summary.push(`${counts.warn} warn`);
+    if (counts.fail) summary.push(`${counts.fail} fail`);
+    if (counts.skip) summary.push(`${counts.skip} skip`);
+    lines.push(`**${summary.join(' · ')}** — ${mode}`);
+    lines.push('');
+    lines.push(`_Checked against [Google's AI-agent UX checklist](https://web.dev/articles/ai-agent-site-ux) via [Agent Audit](https://kylerisley.com/tools/agent-audit/)._`);
+    lines.push('');
+
+    const label = { pass: '✓ PASS', warn: '! WARN', fail: '✗ FAIL', skip: '– SKIP' };
+    for (const check of checks) {
+        const r = check.result;
+        lines.push(`## ${label[r.status]} — ${check.title}`);
+        lines.push('');
+        lines.push(r.detail);
+        if (r.samples && r.samples.length) {
+            lines.push('');
+            lines.push('```html');
+            lines.push(r.samples.join('\n\n'));
+            lines.push('```');
+        }
+        lines.push('');
+    }
+    return lines.join('\n').trim() + '\n';
 }
 
 function renderCheck(check) {

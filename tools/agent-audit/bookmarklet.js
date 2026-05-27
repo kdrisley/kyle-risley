@@ -328,6 +328,32 @@
             .pill-pass { background: #ecfdf5; color: #16a34a; }
             .pill-warn { background: #fffbeb; color: #d97706; }
             .pill-fail { background: #fef2f2; color: #dc2626; }
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .copy-btn {
+                font-size: 12px;
+                font-weight: 500;
+                padding: 4px 10px;
+                background: #fff;
+                color: #4b5563;
+                border: 1px solid #e5e7eb;
+                border-radius: 999px;
+                cursor: pointer;
+                transition: background 0.15s, color 0.15s, border-color 0.15s;
+            }
+            .copy-btn:hover {
+                background: #ededfd;
+                color: #3f37c9;
+                border-color: #ededfd;
+            }
+            .copy-btn.copied {
+                background: #ecfdf5;
+                color: #16a34a;
+                border-color: #ecfdf5;
+            }
             .close {
                 background: transparent;
                 border: none;
@@ -407,7 +433,10 @@
                     <div class="title">Agent Audit</div>
                     <div class="pills">${pills.join('')}</div>
                 </div>
-                <button class="close" aria-label="Close">×</button>
+                <div class="header-actions">
+                    <button class="copy-btn" type="button">Copy results</button>
+                    <button class="close" aria-label="Close">×</button>
+                </div>
             </div>
             <div class="body">
                 ${checks.map(c => `
@@ -432,8 +461,53 @@
         window.__agentAuditPanel = null;
     });
 
+    const copyBtn = shadow.querySelector('.copy-btn');
+    copyBtn.addEventListener('click', () => {
+        const markdown = formatMarkdown();
+        navigator.clipboard.writeText(markdown).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy results';
+                copyBtn.classList.remove('copied');
+            }, 1800);
+        }).catch(() => {
+            copyBtn.textContent = 'Copy failed';
+            setTimeout(() => { copyBtn.textContent = 'Copy results'; }, 1800);
+        });
+    });
+
     document.body.appendChild(host);
     window.__agentAuditPanel = host;
+
+    function formatMarkdown() {
+        const lines = [];
+        lines.push(`# Agent Audit — ${location.href}`);
+        lines.push('');
+        const summary = [];
+        if (counts.pass) summary.push(`${counts.pass} pass`);
+        if (counts.warn) summary.push(`${counts.warn} warn`);
+        if (counts.fail) summary.push(`${counts.fail} fail`);
+        if (counts.skip) summary.push(`${counts.skip} skip`);
+        lines.push(`**${summary.join(' · ')}** — Bookmarklet audit (rendered DOM)`);
+        lines.push('');
+        lines.push(`_Checked against [Google's AI-agent UX checklist](https://web.dev/articles/ai-agent-site-ux) via [Agent Audit](https://kylerisley.com/tools/agent-audit/)._`);
+        lines.push('');
+        const label = { pass: '✓ PASS', warn: '! WARN', fail: '✗ FAIL', skip: '– SKIP' };
+        for (const c of checks) {
+            lines.push(`## ${label[c.status]} — ${c.title}`);
+            lines.push('');
+            lines.push(c.detail);
+            if (c.samples && c.samples.length) {
+                lines.push('');
+                lines.push('```html');
+                lines.push(c.samples.join('\n\n'));
+                lines.push('```');
+            }
+            lines.push('');
+        }
+        return lines.join('\n').trim() + '\n';
+    }
 
     function esc(s) {
         return String(s)

@@ -248,6 +248,30 @@
             border-radius: 999px;
         }
 
+        .copy-btn {
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 12px;
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-light);
+            color: var(--accent-text);
+            border-color: var(--accent-light);
+        }
+
+        .copy-btn.copied {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: var(--green-bg);
+        }
+
         .pill-pass {
             background: var(--green-bg);
             color: var(--green);
