@@ -2,7 +2,7 @@
 // Loaded into the target page by the javascript: bookmarklet stub.
 // Runs full audit (static + computed/rendered) and injects an overlay panel.
 
-(function() {
+(async function() {
     'use strict';
 
     // <details> is intentionally excluded: it's a container; the actual click
@@ -75,6 +75,18 @@
         }
         const title = el.getAttribute('title');
         if (title && title.trim()) return true;
+        return false;
+    }
+
+    // Media that declares its size lets the browser reserve space before the
+    // resource loads, so it doesn't reflow (the dominant cause of CLS). Even in
+    // rendered mode, computed width/height can't tell "sized by CSS" from "sized
+    // by loaded content", so we rely on the reliable signals: width+height attrs
+    // or a CSS aspect-ratio.
+    function hasExplicitDimensions(el) {
+        if (el.hasAttribute('width') && el.hasAttribute('height')) return true;
+        const ar = getComputedStyle(el).aspectRatio;
+        if (ar && ar !== 'auto') return true;
         return false;
     }
 
@@ -280,6 +292,71 @@
             addCheck('Page has a <main> landmark', 'warn', 'No <main> or role="main" found. Landmarks help agents skip chrome.');
         } else {
             addCheck('Page has a <main> landmark', 'warn', `${mains.length} main landmarks found. Should be exactly one.`);
+        }
+    }
+
+    // 9. Media dimensions (layout stability / CLS)
+    {
+        const media = [...document.querySelectorAll('img, iframe, video, embed, object')]
+            .filter(el => !isVisuallyHidden(el).hidden);
+        if (media.length === 0) {
+            addCheck('Media has explicit dimensions (layout stability)', 'skip', 'No visible images, video, or embeds.');
+        } else {
+            const offenders = media.filter(el => !hasExplicitDimensions(el));
+            if (offenders.length === 0) {
+                addCheck('Media has explicit dimensions (layout stability)', 'pass', `All ${media.length} visible media element(s) reserve space via width/height or aspect-ratio.`);
+            } else {
+                addCheck(
+                    'Media has explicit dimensions (layout stability)',
+                    'warn',
+                    `${offenders.length} of ${media.length} visible media element(s) declare no width/height attribute and no CSS aspect-ratio. Undimensioned media shifts the layout as it loads (CLS), moving targets out from under an agent mid-task.`,
+                    offenders.slice(0, 8).map(snippet)
+                );
+            }
+        }
+    }
+
+    // 10. WebMCP (experimental, informational)
+    {
+        const signals = [];
+        if (document.querySelector('script[type="application/mcp+json"], script[type="application/webmcp+json"], script[type="text/mcp"]')) signals.push('<script type="…mcp…">');
+        if (document.querySelector('link[rel~="mcp"], link[rel~="webmcp"]')) signals.push('<link rel="mcp">');
+        if (document.querySelector('meta[name="mcp"], meta[name="webmcp"]')) signals.push('<meta name="webmcp">');
+        if (navigator.modelContext) signals.push('navigator.modelContext');
+        if (window.webmcp) signals.push('window.webmcp');
+        if (signals.length === 0) {
+            addCheck('WebMCP interface (experimental)', 'skip', 'No WebMCP declarations found. WebMCP (machine-readable definitions of what page controls do) is experimental and not yet required — informational only.');
+        } else {
+            addCheck('WebMCP interface (experimental)', 'pass', `WebMCP signal(s) detected: ${signals.join(', ')}. This exposes your interactive elements to agents explicitly.`);
+        }
+    }
+
+    // 11. llms.txt — same-origin here, so we can read it directly.
+    {
+        let info = null;
+        try {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 4000);
+            const r = await fetch(location.origin + '/llms.txt', { signal: ctrl.signal });
+            clearTimeout(timer);
+            if (r.ok) {
+                const text = await r.text();
+                const looksHtml = /^\s*<(?:!doctype|html|head|body)\b/i.test(text);
+                if (!looksHtml && text.trim().length) {
+                    info = { present: true, kb: (text.length / 1024).toFixed(1), headings: (text.match(/^#{1,6}\s+\S/gm) || []).length };
+                } else {
+                    info = { present: false, status: r.status };
+                }
+            } else {
+                info = { present: false, status: r.status };
+            }
+        } catch (e) { info = null; }
+        if (!info) {
+            addCheck('llms.txt summary file', 'skip', "Couldn't fetch /llms.txt (network error, CSP, or blocked).");
+        } else if (info.present) {
+            addCheck('llms.txt summary file', 'pass', `Found /llms.txt (${info.kb} KB${info.headings ? `, ${info.headings} markdown heading${info.headings === 1 ? '' : 's'}` : ''}). Gives agents a machine-readable map of your content.`);
+        } else {
+            addCheck('llms.txt summary file', 'skip', `No /llms.txt found (HTTP ${info.status}). Optional — an emerging convention for summarizing a site to language models.`);
         }
     }
 

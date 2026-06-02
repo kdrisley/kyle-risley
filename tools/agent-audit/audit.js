@@ -143,10 +143,11 @@ async function runUrlAudit() {
     results.innerHTML = '<p style="color:var(--text-tertiary);font-size:14px;padding:8px 0;">Fetching page…</p>';
 
     try {
-        const html = await fetchPageHtml(url, token);
+        const { html, llms } = await fetchPageHtml(url, token);
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const bodyChildren = doc.body ? doc.body.children.length : 0;
         const checks = runStaticChecks(doc);
+        checks.push(buildLlmsTxtCheck(llms));
         renderResults(results, url, checks, bodyChildren);
     } catch (err) {
         results.innerHTML = `<div class="error-banner">${esc(err.message)}. If the site blocks bots or renders content with JavaScript, try the bookmarklet — it works on any page you can load in your browser.</div>`;
@@ -180,7 +181,32 @@ async function fetchPageHtml(url, token) {
         } catch { /* ignore */ }
         throw new Error(`Couldn't fetch the page (HTTP ${resp.status}${detail})`);
     }
-    return await resp.text();
+    const html = await resp.text();
+    const llmsStatus = resp.headers.get('X-Llms-Txt-Status');
+    const llms = llmsStatus === null || llmsStatus === 'error'
+        ? null
+        : {
+            status: parseInt(llmsStatus, 10),
+            present: resp.headers.get('X-Llms-Txt-Present') === 'true',
+            bytes: parseInt(resp.headers.get('X-Llms-Txt-Bytes') || '0', 10),
+            headings: parseInt(resp.headers.get('X-Llms-Txt-Headings') || '0', 10),
+        };
+    return { html, llms };
+}
+
+// llms.txt lives off the site root, so URL mode learns about it from the proxy
+// (which fetches it server-side — the browser can't read it cross-origin).
+function buildLlmsTxtCheck(llms) {
+    const title = 'llms.txt summary file';
+    if (!llms) {
+        return { id: 'llms-txt', title, result: { status: 'skip', detail: "Couldn't determine whether /llms.txt exists." } };
+    }
+    if (llms.present) {
+        const kb = (llms.bytes / 1024).toFixed(1);
+        const headings = llms.headings ? `, ${llms.headings} markdown heading${llms.headings === 1 ? '' : 's'}` : '';
+        return { id: 'llms-txt', title, result: { status: 'pass', detail: `Found /llms.txt (${kb} KB${headings}). Optional today, but it gives agents a machine-readable map of your content.` } };
+    }
+    return { id: 'llms-txt', title, result: { status: 'skip', detail: `No /llms.txt found (HTTP ${llms.status}). Optional — not required by Google Search — but an emerging convention for summarizing a site to language models.` } };
 }
 
 const STATIC_CHECKS = [
@@ -306,7 +332,69 @@ const STATIC_CHECKS = [
             return { status: 'warn', detail: `${mains.length} main landmarks found. Should be exactly one per page.` };
         }
     },
+    {
+        id: 'media-dimensions',
+        title: 'Media has explicit dimensions (layout stability)',
+        run: (doc) => {
+            const media = [...doc.querySelectorAll('img, iframe, video, embed, object')];
+            if (media.length === 0) {
+                return { status: 'skip', detail: 'No images, video, or embeds on this page.' };
+            }
+            const offenders = media.filter(el => !hasExplicitDimensions(el));
+            if (offenders.length === 0) {
+                return { status: 'pass', detail: `All ${media.length} media element(s) declare width/height (or an aspect-ratio).` };
+            }
+            return {
+                status: 'warn',
+                detail: `${offenders.length} of ${media.length} media element(s) have no width/height attribute or inline aspect-ratio. Undimensioned media is the top cause of layout shift (CLS), which moves targets out from under an agent mid-task. External CSS may still size these — confirm with the bookmarklet.`,
+                samples: offenders.slice(0, 5).map(el => trim(el.outerHTML, 240)),
+            };
+        }
+    },
+    {
+        id: 'webmcp',
+        title: 'WebMCP interface (experimental)',
+        run: (doc) => {
+            const signals = detectWebMcpMarkup(doc);
+            if (signals.length === 0) {
+                return { status: 'skip', detail: 'No WebMCP declarations found. WebMCP (machine-readable definitions of what page controls do) is experimental and not yet required — this is informational only.' };
+            }
+            return {
+                status: 'pass',
+                detail: `WebMCP signal(s) detected: ${signals.join(', ')}. This exposes your interactive elements to agents explicitly.`,
+            };
+        }
+    },
 ];
+
+// Media that declares its size up front lets the browser reserve space, so it
+// doesn't reflow when the resource loads. We can only see attributes and inline
+// styles in static HTML — external CSS sizing is invisible here (hence "warn",
+// not "fail"). The bookmarklet's rendered check sees computed styles too.
+function hasExplicitDimensions(el) {
+    if (el.hasAttribute('width') && el.hasAttribute('height')) return true;
+    const style = (el.getAttribute('style') || '').toLowerCase();
+    if (/aspect-ratio\s*:/.test(style)) return true;
+    if (/\bwidth\s*:/.test(style) && /\bheight\s*:/.test(style)) return true;
+    return false;
+}
+
+// WebMCP has no finalized markup, so we sniff the signals proposed so far:
+// a typed <script> block, a <link rel>, or a <meta name>. Rendered mode adds
+// the runtime navigator.modelContext surface on top of these.
+function detectWebMcpMarkup(doc) {
+    const signals = [];
+    if (doc.querySelector('script[type="application/mcp+json"], script[type="application/webmcp+json"], script[type="text/mcp"]')) {
+        signals.push('<script type="…mcp…">');
+    }
+    if (doc.querySelector('link[rel~="mcp"], link[rel~="webmcp"]')) {
+        signals.push('<link rel="mcp">');
+    }
+    if (doc.querySelector('meta[name="mcp"], meta[name="webmcp"]')) {
+        signals.push('<meta name="webmcp">');
+    }
+    return signals;
+}
 
 function hasLabel(el, doc) {
     const ariaLabel = el.getAttribute('aria-label');

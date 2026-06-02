@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Agent Audit — Check Your Site Against Google's AI Agent UX Checklist</title>
-    <meta name="description" content="Audit your site against Google's web.dev recommendations for AI-agent-friendly UX. Run a quick static check on any URL or use the bookmarklet for a full in-browser audit.">
+    <meta name="description" content="Audit your site for AI-agent-friendly UX against Google's web.dev checklist and Lighthouse's agentic browsing audit — accessibility tree, layout stability (CLS), llms.txt, and WebMCP. Run a quick static check on any URL or use the bookmarklet for a full in-browser audit.">
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" async defer></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -475,7 +475,7 @@
         <p class="subtitle">Check your site against Google's AI-agent UX checklist</p>
 
         <div class="intro">
-            <p>This tool checks a page against the recommendations in Google's <a href="https://web.dev/articles/ai-agent-site-ux" target="_blank" rel="noopener">Build agent-friendly websites</a> article. The same things that help screen readers also help AI agents understand and use your site: semantic HTML, linked labels, real interactive elements with the right size and roles.</p>
+            <p>This tool checks a page against the recommendations in Google's <a href="https://web.dev/articles/ai-agent-site-ux" target="_blank" rel="noopener">Build agent-friendly websites</a> article, plus the signals from Lighthouse's <a href="https://developer.chrome.com/docs/lighthouse" target="_blank" rel="noopener">agentic browsing audit</a> — the accessibility tree, layout stability, <code>llms.txt</code>, and WebMCP. The same things that help screen readers also help AI agents understand and use your site: semantic HTML, linked labels, real interactive elements with the right size and roles, and a layout that doesn't shift under them.</p>
             <p style="margin-top:12px;">Two ways to run it:</p>
         </div>
     </div>
@@ -530,6 +530,21 @@
         <details class="faq-item">
             <summary>No "ghost" interactive elements <em>(bookmarklet only)</em></summary>
             <p>Transparent overlays or <code>opacity: 0</code> covers that still capture clicks confuse vision-based agents — they see one thing and click another. We flag elements with computed <code>opacity: 0</code> or <code>visibility: hidden</code> that still take up layout space. Known exception we silently skip: the styled-input pattern, where a native control (e.g. <code>&lt;input type="color"&gt;</code>, file picker, checkbox) is hidden with <code>opacity: 0</code> and overlaid by a styled element. We detect this by the presence of an <code>aria-label</code> or <code>aria-labelledby</code> — that's the signal the developer made the input invisible on purpose, with accessibility intact.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Media has explicit dimensions (layout stability)</summary>
+            <p>Lighthouse's agentic audit flags <a href="https://web.dev/articles/cls" target="_blank" rel="noopener">Cumulative Layout Shift</a> because content that jumps around as it loads moves targets out from under an agent mid-task. The biggest culprit is media without reserved space, so we flag <code>&lt;img&gt;</code>, <code>&lt;iframe&gt;</code>, <code>&lt;video&gt;</code>, and embeds that have no <code>width</code>/<code>height</code> attribute and no CSS <code>aspect-ratio</code>. In URL mode we can only see attributes and inline styles, so external CSS may still size them — it's a warning, not a failure. The bookmarklet also reads computed <code>aspect-ratio</code>.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary><code>llms.txt</code> summary file</summary>
+            <p>An <code>/llms.txt</code> at your site root is an emerging convention for handing language models a machine-readable, markdown summary of your content and structure. It's optional — not required by Google Search, and its benefit is still unproven — so a missing file is reported as a skip, not a failure. URL mode checks it server-side (the browser can't read it cross-origin); the bookmarklet reads it directly since it's same-origin.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>WebMCP interface <em>(experimental)</em></summary>
+            <p><a href="https://github.com/webmachinelearning/webmcp" target="_blank" rel="noopener">WebMCP</a> is a proposed protocol for declaring, machine-readably, what the interactive elements on your page actually <em>do</em> — so an agent doesn't have to infer it. The spec is still in active development, so this check is purely informational: we sniff the signals proposed so far (a typed <code>&lt;script&gt;</code> block, <code>&lt;link rel="mcp"&gt;</code>, a <code>&lt;meta&gt;</code> tag, and in the bookmarklet the runtime <code>navigator.modelContext</code>) and report whether any are present. Absence is a skip, never a failure.</p>
         </details>
     </section>
 

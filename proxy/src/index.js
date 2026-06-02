@@ -44,6 +44,9 @@ function corsHeaders() {
         'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
+        // Custom headers are invisible to cross-origin JS unless explicitly
+        // exposed. The llms.txt summary is delivered via these headers.
+        'Access-Control-Expose-Headers': 'X-Final-Url, X-Original-Status, X-Llms-Txt-Status, X-Llms-Txt-Bytes, X-Llms-Txt-Present, X-Llms-Txt-Headings',
         'Vary': 'Origin',
     };
 }
@@ -91,6 +94,73 @@ async function verifyTurnstile(token, ip, secret) {
         return { ok: false, errors: data['error-codes'] || ['unknown'] };
     } catch (e) {
         return { ok: false, errors: ['fetch-failed: ' + (e.message || 'unknown')] };
+    }
+}
+
+// Fetches <origin>/llms.txt and returns a small summary. Lighthouse's agentic
+// browsing audit checks for this machine-readable summary file; the browser
+// can't read it cross-origin (no CORS on arbitrary sites), so we do it here.
+// Returns null on any error so a missing/broken llms.txt never fails the audit.
+async function summarizeLlmsTxt(pageUrl) {
+    let llmsUrl;
+    try {
+        llmsUrl = new URL('/llms.txt', pageUrl).toString();
+    } catch {
+        return null;
+    }
+
+    // Tighter than the page timeout — llms.txt is an optional extra, so it must
+    // not add much latency to the main audit.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5_000);
+    try {
+        const resp = await fetch(llmsUrl, {
+            method: 'GET',
+            redirect: 'follow',
+            signal: controller.signal,
+            cf: { cacheTtl: 0 },
+            headers: {
+                'User-Agent': 'AgentAuditBot/1.0 (+https://kylerisley.com/tools/agent-audit/)',
+                'Accept': 'text/markdown,text/plain;q=0.9,*/*;q=0.5',
+                'Accept-Language': 'en',
+            },
+        });
+        clearTimeout(timer);
+
+        if (!resp.ok) {
+            return { status: resp.status, present: false, bytes: 0, headings: 0 };
+        }
+
+        // Cap the read — llms.txt should be small, and we only need to sniff it.
+        const reader = resp.body.getReader();
+        const chunks = [];
+        let total = 0;
+        const CAP = 512 * 1024;
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            total += value.byteLength;
+            chunks.push(value);
+            if (total > CAP) { await reader.cancel(); break; }
+        }
+        const decoder = new TextDecoder('utf-8', { fatal: false });
+        let text = '';
+        for (const chunk of chunks) text += decoder.decode(chunk, { stream: true });
+        text += decoder.decode();
+
+        // A soft-404 often returns 200 with an HTML error page. Only count the
+        // file as present if it isn't an HTML document.
+        const looksHtml = /^\s*<(?:!doctype|html|head|body)\b/i.test(text);
+        const headings = (text.match(/^#{1,6}\s+\S/gm) || []).length;
+        return {
+            status: resp.status,
+            present: !looksHtml && text.trim().length > 0,
+            bytes: total,
+            headings,
+        };
+    } catch {
+        clearTimeout(timer);
+        return null;
     }
 }
 
@@ -176,15 +246,25 @@ async function handleProxy(request, env) {
     for (const chunk of chunks) text += decoder.decode(chunk, { stream: true });
     text += decoder.decode();
 
-    return new Response(text, {
-        status: 200,
-        headers: {
-            'Content-Type': contentType,
-            'X-Final-Url': resp.url,
-            'X-Original-Status': String(resp.status),
-            ...corsHeaders(),
-        },
-    });
+    // Check the site's llms.txt off the resolved (post-redirect) origin.
+    const llms = await summarizeLlmsTxt(resp.url);
+
+    const headers = {
+        'Content-Type': contentType,
+        'X-Final-Url': resp.url,
+        'X-Original-Status': String(resp.status),
+        ...corsHeaders(),
+    };
+    if (llms) {
+        headers['X-Llms-Txt-Status'] = String(llms.status);
+        headers['X-Llms-Txt-Present'] = String(llms.present);
+        headers['X-Llms-Txt-Bytes'] = String(llms.bytes);
+        headers['X-Llms-Txt-Headings'] = String(llms.headings);
+    } else {
+        headers['X-Llms-Txt-Status'] = 'error';
+    }
+
+    return new Response(text, { status: 200, headers });
 }
 
 export default {
