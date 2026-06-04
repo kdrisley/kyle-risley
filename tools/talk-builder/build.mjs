@@ -24,6 +24,17 @@ const DL = join(homedir(), 'Downloads');
 const PPTX = join(DL, 'Agentic Commerce @ SMX Advanced (Boston, June 2026).pptx');
 const PDF = join(DL, 'Agentic Commerce @ SMX Advanced (Boston, June 2026).pptx.pdf'); // clean 16:9 slides
 
+// Per-slide image overrides. The baseline deck export captured a couple of slides
+// mid-animation (slide 10's UCP diagram had an empty core; slide 11 had a stray
+// confetti emoji). The "PDF Version" deck has these flattened to their final state
+// and reads better, so those two pages are sourced from it instead. Notes/order are
+// still taken from the baseline deck. { displaySlide: { pdf, page, alt } }
+const PDF_FLAT = join(DL, 'PDF Version - Agentic Commerce @ SMX Advanced (Boston, June 2026).pptx.pdf');
+const IMAGE_OVERRIDES = {
+  10: { pdf: PDF_FLAT, page: 10, alt: 'Universal Commerce Protocol (UCP) — services, capabilities, extensions, and transports' },
+  11: { pdf: PDF_FLAT, page: 11, alt: 'The agentic commerce spectrum' },
+};
+
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = join(REPO, 'talks', 'smx-advanced-2026');
 const SLIDES_DIR = join(OUT, 'slides');
@@ -111,6 +122,7 @@ const slides = order.map((rid, i) => {
   const onSlide = slideText(unzipText(`ppt/slides/${slideFile}`));
   let altCore = onSlide.split(/(?<=[.?!])\s/)[0] || onSlide;
   if (altCore.length > 120) altCore = altCore.slice(0, 117).trimEnd() + '…';
+  if (IMAGE_OVERRIDES[n]?.alt) altCore = IMAGE_OVERRIDES[n].alt;
   const alt = altCore ? `Slide ${n}: ${altCore}` : `Slide ${n}`;
   return { n, notes, alt };
 });
@@ -143,6 +155,19 @@ pngs.forEach((png, i) => {
   if (useWebp) sh('cwebp', ['-quiet', '-q', String(WEBP_Q), src, '-o', dst]);
   else sh('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '82', src, '--out', dst]);
 });
+
+// Apply per-slide image overrides (sourced from an alternate PDF export).
+for (const [n, ov] of Object.entries(IMAGE_OVERRIDES)) {
+  const num = String(n).padStart(2, '0');
+  const dst = join(SLIDES_DIR, `slide-${num}.${EXT}`);
+  sh('pdftoppm', ['-png', '-r', String(RENDER_DPI), '-f', String(ov.page), '-l', String(ov.page),
+    ov.pdf, join(work, `override-${num}`)]);
+  const rendered = readdirSync(work).find((f) => f.startsWith(`override-${num}`) && f.endsWith('.png'));
+  const src = join(work, rendered);
+  if (useWebp) sh('cwebp', ['-quiet', '-q', String(WEBP_Q), src, '-o', dst]);
+  else sh('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '82', src, '--out', dst]);
+  console.log(`  overrode slide ${n} from ${ov.pdf.split('/').pop()} p${ov.page}`);
+}
 
 // Social card from the title slide (16:9, 1200px wide).
 console.log('Building og.png…');
