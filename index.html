@@ -100,6 +100,43 @@
             color: var(--text-tertiary);
             margin-top: 2px;
         }
+        .talk-callout {
+            display: block;
+            padding: 18px 20px;
+            background: var(--accent-light);
+            border: 1px solid #d8d5f9;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+        .talk-callout:hover {
+            border-color: var(--accent);
+            box-shadow: 0 2px 10px rgba(80, 70, 229, 0.12);
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .talk-eyebrow {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--accent-text);
+        }
+        .talk-title {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--text);
+            margin-top: 5px;
+        }
+        .talk-cta {
+            display: block;
+            font-size: 14px;
+            color: var(--accent-text);
+            margin-top: 8px;
+        }
         .links a {
             display: inline-block;
             font-size: 14px;
@@ -185,6 +222,14 @@
 
     <hr>
 
+    <a href="/talks/smx-advanced-2026/" class="talk-callout">
+        <span class="talk-eyebrow">Recent talk · SMX Advanced 2026</span>
+        <span class="talk-title">Agentic Commerce: Adapting Ecommerce SEO for the AI Era</span>
+        <span class="talk-cta">View the slides with speaker notes →</span>
+    </a>
+
+    <hr>
+
     <div class="tools-section">
         <h2>Tools</h2>
         <a href="/tools/ucp-explorer/" class="tool-link">
@@ -194,14 +239,6 @@
         <a href="/tools/agent-audit/" class="tool-link">
             <div class="tool-title">Agent Audit</div>
             <div class="tool-desc">Check your site against Google's AI-agent UX checklist.</div>
-        </a>
-    </div>
-
-    <div class="tools-section">
-        <h2>Talks</h2>
-        <a href="/talks/smx-advanced-2026/" class="tool-link">
-            <div class="tool-title">Agentic Commerce: Adapting Ecommerce SEO for the AI Era</div>
-            <div class="tool-desc">My SMX Advanced talk (Boston, 2026) — every slide with speaker notes.</div>
         </a>
     </div>
 
