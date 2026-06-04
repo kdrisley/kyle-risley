@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era — Kyle Risley</title>
+  <meta name="description" content="My SMX Advanced talk on how AI agents are reshaping ecommerce discovery and checkout — and the SEO playbook for staying visible. Below is every slide with my speaker notes. Hit Present for a fullscreen, slide-by-slide view.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era">
+  <meta property="og:description" content="My SMX Advanced talk on how AI agents are reshaping ecommerce discovery and checkout — and the SEO playbook for staying visible. Below is every slide with my speaker notes. Hit Present for a fullscreen, slide-by-slide view.">
+  <meta property="og:url" content="https://kylerisley.com/talks/smx-advanced-2026/">
+  <meta property="og:image" content="https://kylerisley.com/talks/smx-advanced-2026/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era">
+  <meta name="twitter:description" content="My SMX Advanced talk on how AI agents are reshaping ecommerce discovery and checkout — and the SEO playbook for staying visible. Below is every slide with my speaker notes. Hit Present for a fullscreen, slide-by-slide view.">
+  <meta name="twitter:image" content="https://kylerisley.com/talks/smx-advanced-2026/og.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"PresentationDigitalDocument","name":"Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era","about":"Agentic commerce, ecommerce SEO, AI shopping agents","author":{"@type":"Person","name":"Kyle Risley","url":"https://kylerisley.com/"},"url":"https://kylerisley.com/talks/smx-advanced-2026/","inLanguage":"en"}</script>
+  <style>
+    :root {
+      --accent: #5046e5;
+      --accent-light: #ededfd;
+      --accent-text: #3f37c9;
+      --text: #1a1a1a;
+      --text-secondary: #374151;
+      --text-tertiary: #6b7280;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --surface: #f9fafb;
+      --bg: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px; line-height: 1.7; margin: 0;
+      color: var(--text); background: var(--bg);
+    }
+    a { color: var(--accent-text); text-decoration-color: #c7c5f2; text-underline-offset: 3px; }
+    a:hover { text-decoration-color: var(--accent-text); }
+
+    /* scroll progress */
+    #progress {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0;
+      background: var(--accent); z-index: 50; transition: width 0.1s linear;
+    }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+    header.page { padding: 44px 0 8px; }
+    .back { font-size: 13px; letter-spacing: 0.4px; text-transform: uppercase;
+      text-decoration: none; color: var(--text-tertiary); }
+    .back:hover { color: var(--accent-text); }
+    h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.8px;
+      line-height: 1.25; margin: 18px 0 8px; }
+    .meta { color: var(--text-tertiary); font-size: 15px; margin: 0 0 16px; }
+    .meta strong { color: var(--text-secondary); font-weight: 600; }
+    .intro { color: var(--text-secondary); font-size: 16px; margin: 0 0 22px; max-width: 70ch; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px; font: inherit;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      padding: 9px 16px; border-radius: 9px; border: 1px solid var(--accent);
+      background: var(--accent); color: #fff; transition: filter 0.15s, transform 0.1s;
+    }
+    .btn:hover { filter: brightness(1.07); }
+    .btn:active { transform: translateY(1px); }
+    .btn .key { font-size: 12px; opacity: 0.8; font-weight: 500; }
+    .count { color: var(--text-tertiary); font-size: 14px; }
+
+    hr.div { border: none; border-top: 1px solid var(--border); margin: 26px 0 6px; }
+
+    main { padding-bottom: 80px; }
+    .slide { padding: 30px 0; border-bottom: 1px solid var(--border-light); scroll-margin-top: 16px; }
+    .slide:last-child { border-bottom: none; }
+    figure { margin: 0; }
+    .frame {
+      position: relative; border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .frame img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+    .badge {
+      position: absolute; top: 10px; left: 10px; min-width: 26px; height: 26px;
+      padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; border-radius: 999px;
+      background: rgba(17,17,24,0.72); color: #fff; text-decoration: none;
+      backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.15s;
+    }
+    .frame:hover .badge, .badge:focus-visible { opacity: 1; }
+    .present-here {
+      position: absolute; top: 10px; right: 10px; width: 30px; height: 30px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 15px; line-height: 1; cursor: pointer; color: #fff;
+      background: rgba(17,17,24,0.72); border: none; border-radius: 8px;
+      backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.15s;
+    }
+    .frame:hover .present-here, .present-here:focus-visible { opacity: 1; }
+    .present-here:hover { background: var(--accent); }
+
+    .notes { margin-top: 16px; color: var(--text-secondary); }
+    .notes p { margin: 0 0 12px; }
+    .notes p:last-child { margin-bottom: 0; }
+    .notes .no-notes { color: var(--text-tertiary); font-style: italic; }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+    /* ----- Present mode ----- */
+    #present { position: fixed; inset: 0; z-index: 100; display: none;
+      background: #0b0b0f; color: #e9e9ee; flex-direction: column; }
+    #present.open { display: flex; }
+    body.presenting { overflow: hidden; }
+    #present .bar {
+      position: absolute; top: 0; left: 0; height: 3px; background: var(--accent);
+      width: 0; z-index: 2; transition: width 0.2s ease;
+    }
+    #present .top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; gap: 12px; font-size: 13px; color: #b8b8c4;
+    }
+    #present .top .t { font-weight: 600; color: #e9e9ee; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; }
+    #present .iconbtn {
+      background: rgba(255,255,255,0.08); color: #e9e9ee; border: none; cursor: pointer;
+      width: 34px; height: 34px; border-radius: 8px; font-size: 16px; line-height: 1;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    #present .iconbtn:hover { background: rgba(255,255,255,0.16); }
+    #present .stage {
+      flex: 1; display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: 0;
+    }
+    #present.no-notes-view .stage { grid-template-columns: 1fr; }
+    #present.no-notes-view .pnotes { display: none; }
+    #present .canvas {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      padding: 8px 64px 16px; min-width: 0; min-height: 0;
+    }
+    #present .canvas img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      border-radius: 8px; box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    #present .nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(255,255,255,0.1); color: #fff; font-size: 22px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #present .nav:hover { background: rgba(255,255,255,0.22); }
+    #present .nav[disabled] { opacity: 0.25; cursor: default; }
+    #present .prev { left: 10px; }
+    #present .next { right: 10px; }
+    #present .pnotes {
+      border-left: 1px solid rgba(255,255,255,0.1); padding: 22px 22px 28px;
+      overflow-y: auto; background: #121218; line-height: 1.65;
+    }
+    #present .pnotes h2 { font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase;
+      color: #8b8b98; margin: 0 0 12px; font-weight: 600; }
+    #present .pnotes p { margin: 0 0 12px; color: #d4d4dc; }
+    #present .pnotes .no-notes { color: #6f6f7c; font-style: italic; }
+    #present .foot { text-align: center; padding: 8px 0 14px; font-size: 13px; color: #8b8b98; }
+    #present .foot b { color: #e9e9ee; font-weight: 600; }
+
+    @media (max-width: 760px) {
+      h1 { font-size: 24px; }
+      #present .stage { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+      #present .pnotes { border-left: none; border-top: 1px solid rgba(255,255,255,0.1);
+        max-height: 38vh; }
+      #present .canvas { padding: 8px 52px 10px; }
+      #present.no-notes-view .stage { grid-template-rows: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      #progress, #present .bar { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="progress" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="page">
+      <a class="back" href="/">← kylerisley.com</a>
+      <h1>Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era</h1>
+      <p class="meta"><strong>Kyle Risley</strong> · SMX Advanced, Boston · June 2026</p>
+      <p class="intro">My SMX Advanced talk on how AI agents are reshaping ecommerce discovery and checkout — and the SEO playbook for staying visible. Below is every slide with my speaker notes. Hit Present for a fullscreen, slide-by-slide view.</p>
+      <div class="toolbar">
+        <button class="btn" id="open-present" type="button">▶ Present <span class="key">↵</span></button>
+        <span class="count">55 slides</span>
+      </div>
+      <hr class="div">
+    </header>
+  </div>
+
+  <main class="wrap" id="transcript">
+      <section class="slide" id="slide-1" data-n="1">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-01.webp" width="1920" height="1080"
+             alt="Slide 1: Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era Kyle Risley, Sr." fetchpriority="high">
+        <a class="badge" href="#slide-1" aria-label="Slide 1, link">1</a>
+        <button class="present-here" type="button" data-go="1" aria-label="Present from slide 1" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Hi everyone, my name is Kyle Risley. I’m a Senior SEO Lead at Shopify, and today I’ll be talking about SEO strategies for agentic commerce.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-2" data-n="2">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-02.webp" width="1920" height="1080"
+             alt="Slide 2: Search…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-2" aria-label="Slide 2, link">2</a>
+        <button class="present-here" type="button" data-go="2" aria-label="Present from slide 2" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>For the last 20 years, the search bar was the front door to ecommerce.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-3" data-n="3">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-03.webp" width="1920" height="1080"
+             alt="Slide 3: Ask anything… Hi, what’s on your mind today?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-3" aria-label="Slide 3, link">3</a>
+        <button class="present-here" type="button" data-go="3" aria-label="Present from slide 3" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Now AI is opening a new door.</p>
+        <p>People are moving from keywords to detailed prompts and they expect rich, customized responses.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-4" data-n="4">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-04.webp" width="1920" height="1080"
+             alt="Slide 4: Buy anything… Hi, what’s on your mind today?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-4" aria-label="Slide 4, link">4</a>
+        <button class="present-here" type="button" data-go="4" aria-label="Present from slide 4" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Naturally, this is changing what people expect from their shopping experiences.</p>
+        <p>AI is reshaping how customers discover, research, and purchase products online.</p>
+        <p>This development is often referred to as agentic commerce.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-5" data-n="5">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-05.webp" width="1920" height="1080"
+             alt="Slide 5: …what exactly is agentic commerce?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-5" aria-label="Slide 5, link">5</a>
+        <button class="present-here" type="button" data-go="5" aria-label="Present from slide 5" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>But what does that mean? What exactly is agentic commerce?</p>
+        <p>There isn’t a single definition, but</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-6" data-n="6">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-06.webp" width="1920" height="1080"
+             alt="Slide 6: Agentic commerce is a spectrum of purchase delegation." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-6" aria-label="Slide 6, link">6</a>
+        <button class="present-here" type="button" data-go="6" aria-label="Present from slide 6" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>I think of agentic commerce as a spectrum of purchase delegation, where users gradually delegate more parts of the purchase process to an AI agent.</p>
+        <p>Today I’ll be breaking this spectrum down into four levels.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-7" data-n="7">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-07.webp" width="1920" height="1080"
+             alt="Slide 7: The agentic commerce spectrum" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-7" aria-label="Slide 7, link">7</a>
+        <button class="present-here" type="button" data-go="7" aria-label="Present from slide 7" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Discover, Complete, Delegate, and Coordinate. At each level, the AI agent takes on a larger role in the purchasing journey while the customer stays in charge of key decisions.</p>
+        <p>Commerce is a series of complex negotiations across inventory, pricing, authorization, payment, and fulfillment.</p>
+        <p>Commerce protocols help coordinate these negotiations.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-8" data-n="8">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-08.webp" width="1920" height="1080"
+             alt="Slide 8: Where do agentic commerce protocols fit into this?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-8" aria-label="Slide 8, link">8</a>
+        <button class="present-here" type="button" data-go="8" aria-label="Present from slide 8" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>You may have heard of protocols like Universal Commerce Protocol or Agentic Commerce Protocol.</p>
+        <p>For simplicity, I’ll be focusing on Universal Commerce Protocol, or UCP, for my examples today.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-9" data-n="9">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-09.webp" width="1920" height="1080"
+             alt="Slide 9: Adapted from: modelcontextprotocol.io" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-9" aria-label="Slide 9, link">9</a>
+        <button class="present-here" type="button" data-go="9" aria-label="Present from slide 9" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Just like how Model Context Protocol, or MCP, provides AI applications with standardized access to tools and data,</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-10" data-n="10">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-10.webp" width="1920" height="1080"
+             alt="Slide 10: Source: ucp.dev" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-10" aria-label="Slide 10, link">10</a>
+        <button class="present-here" type="button" data-go="10" aria-label="Present from slide 10" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Commerce protocols provide standardized access to commerce workflows between agents and businesses.</p>
+        <p>UCP was co-developed by Google and Shopify as an open standard for agentic commerce. It’s designed to support the broader shopping journey from discovery to checkout through post-purchase touchpoints like order management.</p>
+        <p>It’s technical council includes Amazon, Etsy, Meta, Salesforce, Stripe, Target, and Walmart.</p>
+        <p>UCP has four core concepts: services, capabilities, extensions, and transports.</p>
+        <p>A website can declare the services it supports, like shopping.</p>
+        <p>And each service includes capabilities, like checkout.</p>
+        <p>Capabilities can include extensions, like discounts.</p>
+        <p>And the site can declare supported transports, like REST, MCP, A2A, or embedded.</p>
+        <p>Now that we know what agentic commerce is and the basic components of a commerce protocol, let’s look at an example of how these concepts work together to influence the user experience.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-11" data-n="11">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-11.webp" width="1920" height="1080"
+             alt="Slide 11: The agentic commerce spectrum 🎉" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-11" aria-label="Slide 11, link">11</a>
+        <button class="present-here" type="button" data-go="11" aria-label="Present from slide 11" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Let’s say a friend has a birthday coming up, and I want my agent’s help finding a gift.</p>
+        <p>We’ll walk through four scenarios, one for each level of agentic commerce.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-12" data-n="12">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-12.webp" width="1920" height="1080"
+             alt="Slide 12: Discover: AI recommends products Level 1 of 4 Source: Google AI Mode" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-12" aria-label="Slide 12, link">12</a>
+        <button class="present-here" type="button" data-go="12" aria-label="Present from slide 12" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Level one, Discover, is the most familiar. It’s where most AI-influenced shopping happens today.</p>
+        <p>At this level, I’m still doing most of the work.</p>
+        <p>Say I want to buy them espresso beans. I open Google AI Mode and ask for ideas.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-13" data-n="13">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-13.webp" width="1920" height="1080"
+             alt="Slide 13: Discover: AI recommends products Level 1 of 4 Source: Google AI Mode" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-13" aria-label="Slide 13, link">13</a>
+        <button class="present-here" type="button" data-go="13" aria-label="Present from slide 13" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>The agent suggests options with price and availability, but I still choose the product,</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-14" data-n="14">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-14.webp" width="1920" height="1080"
+             alt="Slide 14: Discover: AI recommends products Level 1 of 4 Source: forma.la" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-14" aria-label="Slide 14, link">14</a>
+        <button class="present-here" type="button" data-go="14" aria-label="Present from slide 14" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>I click through to the merchant’s site, and I complete the purchase myself.</p>
+        <p>The agent helps me decide, but I still drive the transaction.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-15" data-n="15">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-15.webp" width="1920" height="1080"
+             alt="Slide 15: Level Commerce protocol required?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-15" aria-label="Slide 15, link">15</a>
+        <button class="present-here" type="button" data-go="15" aria-label="Present from slide 15" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>At the Discover level, classic ecommerce SEO remains essential.</p>
+        <p>Indexing, product feeds, structured data, and detailed page content act as enablers to help agents understand and recommend your products. Most optimization work still happens here.</p>
+        <p>Commerce protocols are not required at this level, but they are additive. UCP’s catalog capability lets agents search products, browse categories and filters, and compare prices on a merchant’s site.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-16" data-n="16">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-16.webp" width="1920" height="1080"
+             alt="Slide 16: Complete : AI enables native checkout Level 2 of 4 Source: Google AI Mode" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-16" aria-label="Slide 16, link">16</a>
+        <button class="present-here" type="button" data-go="16" aria-label="Present from slide 16" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>At level two, Complete, the agent still helps me discover products, but checkout moves into the chat window. Here, commerce protocols shift from additive to required.</p>
+        <p>Maybe my friend has a Miami trip coming up, and I want to buy them carry-on luggage.</p>
+        <p>The agent recommends a few options. I choose the Monos carry-on, click “buy,” and complete checkout directly in chat.</p>
+        <p>I still decide what to buy, but the agent facilitates checkout. Of course, if I prefer to visit the merchant’s website, those links are still available to me.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-17" data-n="17">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-17.webp" width="1920" height="1080"
+             alt="Slide 17: Level Commerce protocol required?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-17" aria-label="Slide 17, link">17</a>
+        <button class="present-here" type="button" data-go="17" aria-label="Present from slide 17" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>This experience leverages UCP capabilities like checkout and extensions like fulfillment.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-18" data-n="18">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-18.webp" width="1920" height="1080"
+             alt="Slide 18: Monos UCP profile: monos.com/.well-known/ucp" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-18" aria-label="Slide 18, link">18</a>
+        <button class="present-here" type="button" data-go="18" aria-label="Present from slide 18" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>The agent knows Monos supports agentic checkout in part because of its UCP profile.</p>
+        <p>The UCP profile tells agents which services and capabilities a site supports, and whether it can fulfill the user’s request.</p>
+        <p>For example, if the agent needs to pay with Visa, it can check the UCP profile to confirm Visa is accepted.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-19" data-n="19">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-19.webp" width="1920" height="1080"
+             alt="Slide 19: Source: monos.com" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-19" aria-label="Slide 19, link">19</a>
+        <button class="present-here" type="button" data-go="19" aria-label="Present from slide 19" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Here’s the Monos UCP profile, with declarations for the shopping service, checkout capability, and fulfillment extension.</p>
+        <p>And further down we can see the accepted payment methods, which include Visa.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-20" data-n="20">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-20.webp" width="1920" height="1080"
+             alt="Slide 20: Delegate: AI executes orders against standing rules Level 3 of 4 Not real - hypothetical." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-20" aria-label="Slide 20, link">20</a>
+        <button class="present-here" type="button" data-go="20" aria-label="Present from slide 20" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>At level three, Delegate, the agent operates more autonomously within a set of standing instructions.</p>
+        <p>At this point, we’re mostly describing future-state scenarios. But this is where agentic commerce is headed, and where the rails are being built.</p>
+        <p>For example, maybe my friend loves plants, and I want to gift them one every year for their birthday.</p>
+        <p>I might ask my agent to buy an indoor plant every year, delivered by July 1, under $100, low-light friendly, suitable for Boston, and never a repeat of a previous purchase.</p>
+        <p>I can still approve the purchase, but I no longer need to initiate the process. And if I didn’t want to approve the purchase at the time of payment, I could pre-authorize it.</p>
+        <p>This is where guardrails become essential.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-21" data-n="21">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-21.webp" width="1920" height="1080"
+             alt="Slide 21: Level Commerce protocol required?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-21" aria-label="Slide 21, link">21</a>
+        <button class="present-here" type="button" data-go="21" aria-label="Present from slide 21" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>The Delegate level is enabled by the trust layer.</p>
+        <p>If a customer isn’t manually approving checkout, merchants need to verify several things, including: if the agent is authorized, if the products match the instructions, and if the order stays within spending limits.</p>
+        <p>The Agent Payments Protocol, or AP2, is an open protocol developed by Google that could be used to enable these transactions.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-22" data-n="22">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-22.webp" width="1920" height="1080"
+             alt="Slide 22: Coordinate: AI orchestrates systems toward a goal Level 4 of 4 Not real - hypothetical." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-22" aria-label="Slide 22, link">22</a>
+        <button class="present-here" type="button" data-go="22" aria-label="Present from slide 22" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>At level four, Coordinate, I can ask my agent to build an entire birthday plan.</p>
+        <p>I ask it to book an Italian restaurant with vegetarian options, pick a gift, and send the invites.</p>
+        <p>Once I approve, the agent books everything.</p>
+        <p>At this stage, the agent orchestrates calendars, reservations, payments, and commerce platforms toward a broader goal.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-23" data-n="23">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-23.webp" width="1920" height="1080"
+             alt="Slide 23: Level Commerce protocol required?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-23" aria-label="Slide 23, link">23</a>
+        <button class="present-here" type="button" data-go="23" aria-label="Present from slide 23" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Coordinating multiple agents requires inter-agent communication, which could be supported through protocols like Agent to Agent, or A2A, an open standard originally developed by Google.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-24" data-n="24">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-24.webp" width="1920" height="1080"
+             alt="Slide 24: Good news!" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-24" aria-label="Slide 24, link">24</a>
+        <button class="present-here" type="button" data-go="24" aria-label="Present from slide 24" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>This may sound like a lot, but there’s a good chance you won’t implement it all yourself.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-25" data-n="25">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-25.webp" width="1920" height="1080"
+             alt="Slide 25: If you’re on Shopify, agentic commerce is handled for you." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-25" aria-label="Slide 25, link">25</a>
+        <button class="present-here" type="button" data-go="25" aria-label="Present from slide 25" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>If you’re on Shopify, integrations with Google AI Mode, Gemini, Copilot, ChatGPT, and other surfaces are handled for you.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-26" data-n="26">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-26.webp" width="1920" height="1080"
+             alt="Slide 26: Commerce protocol integration paths Platform The commerce platform handles implementation." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-26" aria-label="Slide 26, link">26</a>
+        <button class="present-here" type="button" data-go="26" aria-label="Present from slide 26" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>If you’re on another commerce platform, check with them to understand their current status with agentic commerce integrations.</p>
+        <p>If you’re on a custom build, you’ll need to follow Google and OpenAI’s integration steps and join their activation waitlists.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-27" data-n="27">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-27.webp" width="1920" height="1080"
+             alt="Slide 27: “Ok." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-27" aria-label="Slide 27, link">27</a>
+        <button class="present-here" type="button" data-go="27" aria-label="Present from slide 27" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>So now that we’ve covered what agentic commerce is, and how it changes the customer search experience, let’s get into how you can show up when users are searching for your products.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-28" data-n="28">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-28.webp" width="1920" height="1080"
+             alt="Slide 28: Success = accessibility + comprehension + authority Accessibility Is your site reachable to AI agents?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-28" aria-label="Slide 28, link">28</a>
+        <button class="present-here" type="button" data-go="28" aria-label="Present from slide 28" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>I think about AI visibility in three pillars: accessibility, comprehension, and authority.</p>
+        <p>Accessibility: can agents reach your site?</p>
+        <p>Comprehension: can they understand your products?</p>
+        <p>Authority: do they trust your brand?</p>
+        <p>They’re the same principles of great SEO, applied to a wider cast of crawlers and agents, some of whom behave a little differently than Googlebot or Bingbot.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-29" data-n="29">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-29.webp" width="1920" height="1080"
+             alt="Slide 29: Accessibility" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-29" aria-label="Slide 29, link">29</a>
+        <button class="present-here" type="button" data-go="29" aria-label="Present from slide 29" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>We’ll start with accessibility.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-30" data-n="30">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-30.webp" width="1920" height="1080"
+             alt="Slide 30: Ensure accessibility at /robots.txt and CDN layer Traditional web index: Googlebot, Bingbot, et al LLM web index: Cla…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-30" aria-label="Slide 30, link">30</a>
+        <button class="present-here" type="button" data-go="30" aria-label="Present from slide 30" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>First, make sure agents aren’t blocked by robots.txt or your CDN.</p>
+        <p>If your CDN is managed by your host or platform, it’s worth confirming that the relevant user agents have access to your site.</p>
+        <p>Beyond traditional search crawlers, Anthropic, OpenAI, and Perplexity have crawlers for their own search indexes.</p>
+        <p>These are distinct from LLM training crawlers.</p>
+        <p>You don’t need to allow LLM training crawlers for your site to be accessible, but I generally think commerce brands should consider it.</p>
+        <p>There are also user-triggered agents. These visit your site when it’s fetched as a citation in an LLM answer, or when an agent takes action on behalf of a user.</p>
+        <p>And finally, Google has a distinct user-agent for validating product data.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-31" data-n="31">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-31.webp" width="1920" height="1080"
+             alt="Slide 31: Comprehension" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-31" aria-label="Slide 31, link">31</a>
+        <button class="present-here" type="button" data-go="31" aria-label="Present from slide 31" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Once agents can access your site, the next question is whether they can understand it.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-32" data-n="32">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-32.webp" width="1920" height="1080"
+             alt="Slide 32: Most AI bots do not reliably render JS!" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-32" aria-label="Slide 32, link">32</a>
+        <button class="present-here" type="button" data-go="32" aria-label="Present from slide 32" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>As a reminder: most AI bots are not rendering JavaScript.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-33" data-n="33">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-33.webp" width="1920" height="1080"
+             alt="Slide 33: Critical content to render server side Core HTML on-page factors (title, text, images, links) Structured data (produc…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-33" aria-label="Slide 33, link">33</a>
+        <button class="present-here" type="button" data-go="33" aria-label="Present from slide 33" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>To account for this, render critical content server-side.</p>
+        <p>Your critical content includes:</p>
+        <p>Your core HTML</p>
+        <p>Structured data</p>
+        <p>User review modules</p>
+        <p>FAQs and Q&amp;A modules</p>
+        <p>FAQ, Q&amp;A, and review modules often come from third-party apps and render client-side, so double-check them. Some of these apps have options for server side rendering that may be available.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-34" data-n="34">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-34.webp" width="1920" height="1080"
+             alt="Slide 34: Source: https://onely.com/tools/wwjd/ Javascript Disabled Javascript Enabled" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-34" aria-label="Slide 34, link">34</a>
+        <button class="present-here" type="button" data-go="34" aria-label="Present from slide 34" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>When auditing your rendering, here’s an example of what you want to see: no major difference in critical content rendering when javascript is disabled.</p>
+        <p>This page is not using JS to render any critical page content.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-35" data-n="35">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-35.webp" width="1920" height="1080"
+             alt="Slide 35: Source: https://onely.com/tools/wwjd/ Javascript Disabled Javascript Enabled" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-35" aria-label="Slide 35, link">35</a>
+        <button class="present-here" type="button" data-go="35" aria-label="Present from slide 35" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Here’s what you don’t want to see. On the left, the product’s description isn’t rendered when JS is disabled. This is what you should look out for and fix.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-36" data-n="36">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-36.webp" width="1920" height="1080"
+             alt="Slide 36: Check how JS renders your page content onely.com/tools/wwjd/ algorythmic.co/llm-content-visibility-scanner/ or just d…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-36" aria-label="Slide 36, link">36</a>
+        <button class="present-here" type="button" data-go="36" aria-label="Present from slide 36" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Here are two free tools for debugging JavaScript rendering.</p>
+        <p>The first is What Would JavaScript Do, from Onely, that’s where the previous screenshots were from</p>
+        <p>The second is the LLM Content Visibility Scanner from Lily Ray’s company, Algorithmic.</p>
+        <p>You can also just disable JS in your browser for quick checks.</p>
+        <p>These changes don’t just benefit AI crawlers - they are also appreciated by Googlebot and Bingbot, even though they have more sophisticated rendering capabilities.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-37" data-n="37">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-37.webp" width="1920" height="1080"
+             alt="Slide 37: Product data quality is more important than ever." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-37" aria-label="Slide 37, link">37</a>
+        <button class="present-here" type="button" data-go="37" aria-label="Present from slide 37" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>And if we’re talking about Comprehension, we have to talk about product data quality.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-38" data-n="38">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-38.webp" width="1920" height="1080"
+             alt="Slide 38: primary data sources = complete + error-free + aligned 3P product feeds (e.g." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-38" aria-label="Slide 38, link">38</a>
+        <button class="present-here" type="button" data-go="38" aria-label="Present from slide 38" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>The three most important surfaces to audit are product feeds, platform data, and website content.</p>
+        <p>Your product feeds, like your Google Merchant Center feed, are piped directly into shopping graphs and product retrieval systems.</p>
+        <p>Your platform data is the information entered into your PIM, CMS, or commerce backend.</p>
+        <p>This is especially important if your platform is packaging that data and feeding it to AI commerce surfaces like ChatGPT, Copilot, or Google AI Mode.</p>
+        <p>Finally, your website content should match your feeds and platform data, so every source reinforces the others.</p>
+        <p>For example, you don’t want one price showing in your product feed and a different price showing in your website content.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-39" data-n="39">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-39.webp" width="1920" height="1080"
+             alt="Slide 39: Most common product feed data quality issues Missing attributes (age group, gender, color, size) Missing identifiers…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-39" aria-label="Slide 39, link">39</a>
+        <button class="present-here" type="button" data-go="39" aria-label="Present from slide 39" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Common feed quality issues include:</p>
+        <p>Missing attributes.</p>
+        <p>Missing identifiers.</p>
+        <p>Missing shipping or return information.</p>
+        <p>Image quality issues.</p>
+        <p>As a heads up, starting next January, Google Merchant Center’s new minimum image size will be 500 by 500 pixels. But 1500 by 1500 should still be your goal for best performance.</p>
+        <p>The simplest way to audit this is directly with the feed consumer, like Google Merchant Center or Microsoft Merchant Center. Focus on issues that are causing demotions or disapprovals.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-40" data-n="40">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-40.webp" width="1920" height="1080"
+             alt="Slide 40: Include specs on your product detail pages." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-40" aria-label="Slide 40, link">40</a>
+        <button class="present-here" type="button" data-go="40" aria-label="Present from slide 40" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Another factor that’s more important than ever is including complete dimensions and specs on your PDPs.</p>
+        <p>Here’s an example to demonstrate</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-41" data-n="41">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-41.webp" width="1920" height="1080"
+             alt="Slide 41: Source: Google Gemini" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-41" aria-label="Slide 41, link">41</a>
+        <button class="present-here" type="button" data-go="41" aria-label="Present from slide 41" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>I asked Gemini  “What’s a good tumbler with a straw and handle for my treadmill?”</p>
+        <p>and notice what Google did here.</p>
+        <p>It transforms my use case - using the tumbler on a treadmill - into additional product requirements: being leakproof with a tapered base.</p>
+        <p>They suggest HydroJug’s Traveler Tumbler as a good result.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-42" data-n="42">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-42.webp" width="1920" height="1080"
+             alt="Slide 42: Source: thehydrojug.com" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-42" aria-label="Slide 42, link">42</a>
+        <button class="present-here" type="button" data-go="42" aria-label="Present from slide 42" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Here’s the HydroJug product page.</p>
+        <p>They didn’t need to say, “This works for treadmills.” right on the page. Instead, they provided the building blocks an agent could use to reach that conclusion on its own.</p>
+        <p>In this case, that means saying the product is leakproof, has a cupholder-friendly base, and providing the exact base diameter in the specs.</p>
+        <p>They also mention the straw and handle on the page, which were my other requirements.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-43" data-n="43">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-43.webp" width="1920" height="1080"
+             alt="Slide 43: Source: thehydrojug.com" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-43" aria-label="Slide 43, link">43</a>
+        <button class="present-here" type="button" data-go="43" aria-label="Present from slide 43" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Even after including dimensions and specs, if you know there are common use cases or FAQs related to a product, you should still include those explicitly.</p>
+        <p>Specs and dimensions act as a backstop. They help agents infer relevance, even when the answer isn’t spelled out.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-44" data-n="44">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-44.webp" width="1920" height="1080"
+             alt="Slide 44: Authority" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-44" aria-label="Slide 44, link">44</a>
+        <button class="present-here" type="button" data-go="44" aria-label="Present from slide 44" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>This brings us to the final pillar of success for AI visibility: authority</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-45" data-n="45">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-45.webp" width="1920" height="1080"
+             alt="Slide 45: Your brand needs contextual mentions." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-45" aria-label="Slide 45, link">45</a>
+        <button class="present-here" type="button" data-go="45" aria-label="Present from slide 45" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>The biggest change when looking at AI visibility is the importance of mentions. That is, other websites mentioning your brand and products.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-46" data-n="46">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-46.webp" width="1920" height="1080"
+             alt="Slide 46: Mentions have the strongest correlation with AI visibility YouTube mentions (being mentioned in many videos) YouTube…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-46" aria-label="Slide 46, link">46</a>
+        <button class="present-here" type="button" data-go="46" aria-label="Present from slide 46" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Ahrefs published a study in December that found mentions had one of the strongest correlations with appearing in AI responses — especially YouTube mentions and broader web mentions.</p>
+        <p>This finding held true for both ChatGPT and Google AI Mode.</p>
+        <p>So you should not stop caring about links. But mentions are becoming a trust signal for AI visibility.</p>
+        <p>Even when looking at the fourth and fifth strongest factors, branded anchors and branded search volume, you still see the importance of branding. This has long been the case for SEO success and it’s a similar story when it comes to appearing in AI results too.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-47" data-n="47">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-47.webp" width="1920" height="1080"
+             alt="Slide 47: Google Shopping visibility may carry over to ChatGPT" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-47" aria-label="Slide 47, link">47</a>
+        <button class="present-here" type="button" data-go="47" aria-label="Present from slide 47" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>When looking specifically at product results, some research from earlier in the year found a strong correlation between ranking in Google Shopping and ranking in ChatGPT product carousel results.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-48" data-n="48">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-48.webp" width="1920" height="1080"
+             alt="Slide 48: Study: “ChatGPT favors higher Google Shopping positions” Source: Search Engine Land “New finding: ChatGPT sources 83%…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-48" aria-label="Slide 48, link">48</a>
+        <button class="present-here" type="button" data-go="48" aria-label="Present from slide 48" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Peec AI published this study on Search Engine Land in March, and two findings stood out.</p>
+        <p>First, ChatGPT’s product carousel appears to favor products that already rank well in Google Shopping. When a ChatGPT carousel product matched a Google Shopping result, about 84% of those matches came from the top 20 results. Only 16% came from positions 21 to 40.</p>
+        <p>So if you’re buried deeper in Google Shopping results, you may also be less likely to surface in ChatGPT product carousels.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-49" data-n="49">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-49.webp" width="1920" height="1080"
+             alt="Slide 49: Study: “ChatGPT sources 83% of its carousel products from Google Shopping via shopping query fan-outs” Source: Search…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-49" aria-label="Slide 49, link">49</a>
+        <button class="present-here" type="button" data-go="49" aria-label="Present from slide 49" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Second, 83% of products featured in ChatGPT strongly matched products in Google Shopping, versus just 11% matching with Bing Shopping. That suggests Google was likely the main search engine ChatGPT used when sourcing products outside of OpenAI’s index.</p>
+        <p>I recommend reading the full study. The methodology is interesting, and there are more findings than I can cover here.</p>
+        <p>This does not prove ChatGPT’s pipeline will always work this way. But at the time of the study, Google Shopping visibility appeared to influence ChatGPT product carousel visibility.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-50" data-n="50">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-50.webp" width="1920" height="1080"
+             alt="Slide 50: Your agentic readiness plan" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-50" aria-label="Slide 50, link">50</a>
+        <button class="present-here" type="button" data-go="50" aria-label="Present from slide 50" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Let’s recap with an agentic readiness plan.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-51" data-n="51">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-51.webp" width="1920" height="1080"
+             alt="Slide 51: Your products are accessible and readable Audit robots.txt and CDN access Confirm critical PDP content is crawlable w…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-51" aria-label="Slide 51, link">51</a>
+        <button class="present-here" type="button" data-go="51" aria-label="Present from slide 51" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>To start, make sure AI systems can access and read your products.</p>
+        <p>Check your robots.txt and CDN rules. Don’t assume you’re fine just because Googlebot can crawl you.</p>
+        <p>Confirm that your most important PDP content is crawlable without requiring JavaScript. Be sure to double check any 3P apps rendering critical content.</p>
+        <p>Next, make sure your feeds are live, synced, and free of errors.</p>
+        <p>Finally, fix the obvious Merchant Center issues first, focusing on anything causing a disapproval or demotion</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-52" data-n="52">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-52.webp" width="1920" height="1080"
+             alt="Slide 52: Product pages provide complete context Surface relevant dimensions , specs , features , and use cases Lots of content?" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-52" aria-label="Slide 52, link">52</a>
+        <button class="present-here" type="button" data-go="52" aria-label="Present from slide 52" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Next: give AI systems enough context to match products to prompts.</p>
+        <p>Surface the specs, dimensions, features, and use cases that help agents match products to shopper constraints.</p>
+        <p>If you have lots of content, include descriptive headings for scannability.</p>
+        <p>If there are questions about a product that you know are common, answer those directly on the page in an FAQ section.</p>
+        <p>Make sure you’re publishing your ratings &amp; reviews directly on the page, ideally server side.</p>
+        <p>Finally, add product schema to validate and supplement feed data.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-53" data-n="53">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-53.webp" width="1920" height="1080"
+             alt="Slide 53: AI systems still need trust signals Earn mentions , reviews , links e.g." loading="lazy" decoding="async">
+        <a class="badge" href="#slide-53" aria-label="Slide 53, link">53</a>
+        <button class="present-here" type="button" data-go="53" aria-label="Present from slide 53" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Next, build your brand’s trust signals.</p>
+        <p>AI agents and LLM-powered search experiences still need evidence that a brand is credible, relevant, and associated with the right categories and use cases.</p>
+        <p>So a lot of the classic work still matters: earning mentions and links across trusted sources on the web, including social sites like YouTube and Reddit.</p>
+        <p>This matters because AI systems often use fan out queries to augment their answers with information from external search, shopping, and content surfaces before generating a response. If your brand does not show up in those supporting results, it is less likely to be included in an answer.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-54" data-n="54">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-54.webp" width="1920" height="1080"
+             alt="Slide 54: Prepare for native agentic checkout Confirm your integration path Platform or custom Validate checkout inputs: paymen…" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-54" aria-label="Slide 54, link">54</a>
+        <button class="present-here" type="button" data-go="54" aria-label="Present from slide 54" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Finally, if you want to move beyond discovery into agentic checkout, get the operational layer ready.</p>
+        <p>Most importantly, know your integration path.</p>
+        <p>If you’re on a commerce platform, check with them first. And if you’re on Shopify, a lot of this is already handled for you.</p>
+        <p>If you’re on a custom build, you’ll need to do the integration yourself and reach out to Google or OpenAI for activation.</p>
+        <p>Next, validate the inputs that create the checkout state.</p>
+        <p>That includes payment, tax and shipping logic, returns, pricing, inventory, and variants.</p>
+        <p>Again, if you’re on a commerce platform with managed checkout, a lot of this is likely handled for you.</p>
+        <p>Next, you should think carefully about which products are eligible for native agentic checkout.</p>
+        <p>Start with products that are simple to transact: evergreen, self-serve, and easy to fulfill.</p>
+        <p>Avoid anything that needs custom input from the customer like engravings or personalized products.</p>
+        <p>And that’s the playbook: make your products accessible, understandable, trusted, and ready for agentic checkout.</p>
+      </figcaption>
+    </figure>
+      </section>
+      <section class="slide" id="slide-55" data-n="55">
+    <figure>
+      <div class="frame">
+        <img src="slides/slide-55.webp" width="1920" height="1080"
+             alt="Slide 55: Let’s go!" loading="lazy" decoding="async">
+        <a class="badge" href="#slide-55" aria-label="Slide 55, link">55</a>
+        <button class="present-here" type="button" data-go="55" aria-label="Present from slide 55" title="Present from here">⤢</button>
+      </div>
+      <figcaption class="notes">
+        <p>Thank you for your time!</p>
+        <p>And if you want to learn more about Universal Commerce Protocol, I published a free UCP explorer tool on my site.</p>
+      </figcaption>
+    </figure>
+      </section>
+  </main>
+
+  <!-- Present mode (progressive enhancement; transcript above works without JS) -->
+  <div id="present" role="dialog" aria-modal="true" aria-label="Slide presentation" hidden>
+    <div class="bar" id="p-bar"></div>
+    <div class="top">
+      <span class="t">Agentic Commerce</span>
+      <button class="iconbtn" id="p-notes-toggle" type="button" aria-label="Toggle notes" title="Toggle notes (n)">📝</button>
+      <button class="iconbtn" id="p-close" type="button" aria-label="Close presentation" title="Close (Esc)">✕</button>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <button class="nav prev" id="p-prev" type="button" aria-label="Previous slide">‹</button>
+        <img id="p-img" alt="">
+        <button class="nav next" id="p-next" type="button" aria-label="Next slide">›</button>
+      </div>
+      <aside class="pnotes" id="p-notes" aria-live="polite">
+        <h2>Speaker notes</h2>
+        <div id="p-notes-body"></div>
+      </aside>
+    </div>
+    <div class="foot"><b id="p-cur">1</b> / 55 &nbsp;·&nbsp; ← → to navigate &nbsp;·&nbsp; Esc to close</div>
+  </div>
+
+  <script>
+  (function () {
+    var sections = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var total = sections.length;
+    var data = sections.map(function (s) {
+      var img = s.querySelector('img');
+      return {
+        src: img.getAttribute('src'),
+        alt: img.getAttribute('alt'),
+        notes: s.querySelector('.notes').innerHTML,
+      };
+    });
+
+    // ---- scroll progress ----
+    var prog = document.getElementById('progress');
+    function onScroll() {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      prog.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+    }
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // ---- present mode ----
+    var P = document.getElementById('present');
+    var pImg = document.getElementById('p-img');
+    var pNotesBody = document.getElementById('p-notes-body');
+    var pCur = document.getElementById('p-cur');
+    var pBar = document.getElementById('p-bar');
+    var pPrev = document.getElementById('p-prev');
+    var pNext = document.getElementById('p-next');
+    var idx = 0, lastFocus = null, open = false;
+
+    function render() {
+      var d = data[idx];
+      pImg.src = d.src; pImg.alt = d.alt;
+      pNotesBody.innerHTML = d.notes;
+      pCur.textContent = idx + 1;
+      pBar.style.width = ((idx + 1) / total) * 100 + '%';
+      pPrev.disabled = idx === 0;
+      pNext.disabled = idx === total - 1;
+      history.replaceState(null, '', '#slide-' + (idx + 1));
+    }
+    function go(i) { idx = Math.max(0, Math.min(total - 1, i)); render(); }
+
+    function openAt(i) {
+      idx = Math.max(0, Math.min(total - 1, i));
+      lastFocus = document.activeElement;
+      P.hidden = false; P.classList.add('open');
+      document.body.classList.add('presenting');
+      open = true; render();
+      document.getElementById('p-close').focus();
+    }
+    function close() {
+      P.classList.remove('open'); P.hidden = true;
+      document.body.classList.remove('presenting');
+      open = false;
+      // leave the hash so you land on the slide you were viewing
+      var target = document.getElementById('slide-' + (idx + 1));
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+      else if (target) target.scrollIntoView();
+    }
+
+    // nearest slide to viewport center, for the header Present button
+    function nearestIndex() {
+      var mid = scrollY + innerHeight / 2, best = 0, bestD = Infinity;
+      sections.forEach(function (s, i) {
+        var r = s.getBoundingClientRect();
+        var c = scrollY + r.top + r.height / 2;
+        var dist = Math.abs(c - mid);
+        if (dist < bestD) { bestD = dist; best = i; }
+      });
+      return best;
+    }
+
+    document.getElementById('open-present').addEventListener('click', function () {
+      openAt(nearestIndex());
+    });
+    document.getElementById('p-close').addEventListener('click', close);
+    pPrev.addEventListener('click', function () { go(idx - 1); });
+    pNext.addEventListener('click', function () { go(idx + 1); });
+    document.getElementById('p-notes-toggle').addEventListener('click', function () {
+      P.classList.toggle('no-notes-view');
+    });
+
+    // per-slide "present from here" buttons
+    document.querySelectorAll('.present-here').forEach(function (b) {
+      b.addEventListener('click', function () { openAt(parseInt(b.dataset.go, 10) - 1); });
+    });
+
+    addEventListener('keydown', function (e) {
+      if (!open) {
+        if (e.key === 'Enter' && e.target === document.body) { e.preventDefault(); openAt(nearestIndex()); }
+        return;
+      }
+      switch (e.key) {
+        case 'Escape': e.preventDefault(); close(); break;
+        case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); go(idx + 1); break;
+        case 'ArrowLeft': case 'PageUp': e.preventDefault(); go(idx - 1); break;
+        case 'Home': e.preventDefault(); go(0); break;
+        case 'End': e.preventDefault(); go(total - 1); break;
+        case 'n': case 'N': P.classList.toggle('no-notes-view'); break;
+        case 'f': case 'F':
+          if (!document.fullscreenElement) P.requestFullscreen && P.requestFullscreen();
+          else document.exitFullscreen && document.exitFullscreen();
+          break;
+        case 'Tab': { // simple focus trap
+          var f = P.querySelectorAll('button:not([disabled])');
+          if (!f.length) break;
+          var first = f[0], last = f[f.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          break;
+        }
+      }
+    });
+
+    // basic swipe on touch
+    var sx = null;
+    P.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+    P.addEventListener('touchend', function (e) {
+      if (sx === null) return;
+      var dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 50) go(idx + (dx < 0 ? 1 : -1));
+      sx = null;
+    }, { passive: true });
+  })();
+  </script>
+</body>
+</html>
