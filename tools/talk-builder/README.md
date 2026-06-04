@@ -15,16 +15,21 @@ readable with JavaScript disabled; Present mode is progressive enhancement layer
 
 ## Sources
 
-Read from `~/Downloads/` (paths are constants at the top of `build.mjs`):
+The deck files are committed in **`tools/talk-builder/sources/`** so builds are
+reproducible without a local Downloads folder (paths are constants at the top of
+`build.mjs`):
 
 - **`…(Boston, June 2026).pptx.pdf`** — the clean 16:9 slides (no notes baked in).
-  This is the image source. (The `(1).pdf` / `(2).pdf` variants are a duplicate and a
-  notes-pages export — not used.)
+  This is the image source for 53 of the 55 slides.
 - **`…(Boston, June 2026).pptx`** — a zip; speaker notes are pulled from
   `ppt/notesSlides/notesSlideN.xml`, mapped to display order via `presentation.xml` +
   per-slide rels. Alt text comes from each slide's on-slide text.
+- **`PDF Version - …(Boston, June 2026).pptx.pdf`** — an export with animations
+  flattened to their final state; slides 10 & 11 are sourced from here (they were
+  captured mid-animation in the baseline export). See `IMAGE_OVERRIDES` in `build.mjs`.
 
-If the deck filenames change, update the `PPTX` / `PDF` constants in `build.mjs`.
+If the deck changes, drop the new file(s) into `sources/` and update the `PPTX` /
+`PDF` / `PDF_FLAT` constants (and `IMAGE_OVERRIDES`) in `build.mjs` as needed.
 
 ## Prerequisites
 

@@ -13,14 +13,16 @@
 
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync, readdirSync, copyFileSync, writeFileSync, existsSync } from 'node:fs';
-import { homedir, tmpdir } from 'node:os';
+import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const DL = join(homedir(), 'Downloads');
+// Source decks live alongside this script (tools/talk-builder/sources/) so builds
+// are reproducible without depending on a local Downloads folder.
+const DL = join(dirname(fileURLToPath(import.meta.url)), 'sources');
 const PPTX = join(DL, 'Agentic Commerce @ SMX Advanced (Boston, June 2026).pptx');
 const PDF = join(DL, 'Agentic Commerce @ SMX Advanced (Boston, June 2026).pptx.pdf'); // clean 16:9 slides
 
