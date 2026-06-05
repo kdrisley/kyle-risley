@@ -46,6 +46,10 @@ const IMG_W = 1920;
 const IMG_H = 1080;
 const WEBP_Q = 82;
 
+// Flip to true to "announce" the talk: drops the noindex meta so it can be indexed.
+// Pair with linking the page from the homepage (see index.html "Talks" section).
+const ANNOUNCED = true;
+
 const TALK = {
   title: 'Agentic Commerce: Adapting Ecommerce SEO Strategies for the AI Era',
   shortTitle: 'Agentic Commerce',
@@ -216,8 +220,7 @@ const html = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex">
-  <link rel="icon" href="/favicon.ico" sizes="any">
+${ANNOUNCED ? '' : '  <meta name="robots" content="noindex">\n'}  <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
