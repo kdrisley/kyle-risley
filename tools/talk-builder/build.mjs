@@ -37,6 +37,25 @@ const IMAGE_OVERRIDES = {
   11: { pdf: PDF_FLAT, page: 11, alt: 'The agentic commerce spectrum' },
 };
 
+// Per-slide notes overrides. The notes are a verbatim pull of the deck's speaker
+// notes — which are a spoken-word transcript. A few read awkwardly as written
+// page text (a sentence that trails off onto the next slide, a missing period),
+// so we tidy those for legibility without changing wording. `drop: true` removes
+// the note entirely (slide 1 is just the speaker self-introducing — redundant on a
+// page that already names the speaker). `edits` are exact substring replacements
+// applied per paragraph. Generic whitespace tidy (e.g. double spaces) is handled
+// in notesParagraphs(). { displaySlide: { drop } | { edits: [[from, to], …] } }
+const NOTES_OVERRIDES = {
+  1: { drop: true },
+  5: { edits: [['There isn’t a single definition, but', 'There isn’t a single definition, but…']] },
+  9: { edits: [['standardized access to tools and data,', 'standardized access to tools and data…']] },
+  13: { edits: [['but I still choose the product,', 'but I still choose the product.']] },
+  36: { edits: [['the previous screenshots were from', 'the previous screenshots were from.']] },
+  40: { edits: [['Here’s an example to demonstrate', 'Here’s an example to demonstrate.']] },
+  44: { edits: [['for AI visibility: authority', 'for AI visibility: authority.']] },
+  51: { edits: [['causing a disapproval or demotion', 'causing a disapproval or demotion.']] },
+};
+
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = join(REPO, 'talks', 'smx-advanced-2026');
 const SLIDES_DIR = join(OUT, 'slides');
@@ -95,7 +114,7 @@ function notesParagraphs(xml) {
   const out = [];
   for (const p of paras) {
     const runs = [...p.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((m) => decodeXml(m[1]));
-    const line = runs.join('').replace(/‹#›/g, '').trim();
+    const line = runs.join('').replace(/‹#›/g, '').replace(/\s+/g, ' ').trim();
     if (line) out.push(line);
   }
   return out;
@@ -124,7 +143,12 @@ const slides = order.map((rid, i) => {
   const slideNum = slideFile.match(/slide(\d+)\.xml/)[1];
   const srels = unzipText(`ppt/slides/_rels/slide${slideNum}.xml.rels`);
   const noteFile = (srels.match(/notesSlides\/(notesSlide\d+\.xml)/) || [])[1] || null;
-  const notes = noteFile ? notesParagraphs(unzipText(`ppt/notesSlides/${noteFile}`)) : [];
+  let notes = noteFile ? notesParagraphs(unzipText(`ppt/notesSlides/${noteFile}`)) : [];
+  const noteOv = NOTES_OVERRIDES[n];
+  if (noteOv?.drop) notes = [];
+  else if (noteOv?.edits) {
+    notes = notes.map((p) => noteOv.edits.reduce((s, [from, to]) => s.split(from).join(to), p));
+  }
   const onSlide = slideText(unzipText(`ppt/slides/${slideFile}`));
   let altCore = onSlide.split(/(?<=[.?!])\s/)[0] || onSlide;
   if (altCore.length > 120) altCore = altCore.slice(0, 117).trimEnd() + '…';
